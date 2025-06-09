@@ -75,9 +75,6 @@ export function Chat({ initialMessages }: ChatProps) {
               message={message}
               onRetry={handleMessageRetryWithAutoScroll}
               canRetry={status !== "streaming"}
-              isStreaming={
-                status === "streaming" && index === messages.length - 1
-              }
             />
           ))}
 

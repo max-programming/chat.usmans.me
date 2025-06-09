@@ -1,7 +1,6 @@
 import { LogoutButton } from "@/components/LogoutButton";
 import { Chat } from "@/components/chat/chat";
 import { createFileRoute } from "@tanstack/react-router";
-import { processMarkdownMessages } from "@/lib/markdown.server";
 
 export const Route = createFileRoute("/_protected/")({
   component: ChatInterface,
@@ -40,12 +39,9 @@ export const Route = createFileRoute("/_protected/")({
       },
     ];
 
-    // Process markdown content on the server
-    const processedMessages = await processMarkdownMessages(rawMessages);
-
     return {
       user: context.user!,
-      messages: processedMessages,
+      messages: rawMessages,
     };
   },
 });

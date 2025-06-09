@@ -1,22 +1,19 @@
-import { cn } from "@/lib/utils";
 import { Copy, RotateCcw } from "lucide-react";
 import type { Message } from "@/hooks/use-chat-messages";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "../ui/button";
-import { StreamingMarkdown } from "../ui/streaming-markdown";
+import { Markdown } from "../ui/markdown";
 
 interface ChatMessageProps {
   message: Message & { processedContent?: string };
   onRetry?(messageId: string): void;
   canRetry?: boolean;
-  isStreaming?: boolean;
 }
 
 export function ChatMessage({
   message,
   onRetry,
   canRetry = false,
-  isStreaming = false,
 }: ChatMessageProps) {
   const [, copyToClipboard] = useCopyToClipboard();
   const isUser = message.role === "user";
@@ -35,12 +32,7 @@ export function ChatMessage({
                 {message.content}
               </div>
             ) : (
-              <StreamingMarkdown
-                content={message.content}
-                processedContent={message.processedContent}
-                isStreaming={isStreaming}
-                className="text-sm"
-              />
+              <Markdown content={message.content} className="text-sm" />
             )}
             <p className="text-xs mt-1 opacity-70">
               {message.timestamp.toLocaleTimeString([], {
@@ -79,11 +71,7 @@ export function ChatMessage({
   return (
     <div className="w-full">
       <div className="mb-2">
-        <StreamingMarkdown
-          content={message.content}
-          processedContent={message.processedContent}
-          isStreaming={isStreaming && message.role === "assistant"}
-        />
+        <Markdown content={message.content} />
         <p className="text-xs mt-2 opacity-70">
           {message.timestamp.toLocaleTimeString([], {
             hour: "2-digit",
