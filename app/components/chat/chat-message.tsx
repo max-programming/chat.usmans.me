@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Copy, RotateCcw } from "lucide-react";
-import type { Message } from "./chat";
+import type { Message } from "@/hooks/use-chat-messages";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "../ui/button";
 
