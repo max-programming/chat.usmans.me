@@ -47,6 +47,7 @@ export function ChatInput({
 
   const isStreaming = status === "streaming";
   const hasError = !!error;
+  const canSendMessage = !disabled && !isStreaming;
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-3 items-end">
@@ -90,7 +91,7 @@ export function ChatInput({
         ) : (
           <Button
             type="submit"
-            disabled={!message.trim() || disabled}
+            disabled={!message.trim() || !canSendMessage}
             size="icon"
             className="h-[50px] w-[50px] flex-shrink-0"
           >

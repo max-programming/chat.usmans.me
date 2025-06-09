@@ -41,7 +41,7 @@ export function Chat({ initialMessages }: ChatProps) {
   } = useChatScroll();
 
   useEffect(() => {
-    if (shouldAutoScroll || status === "streaming") {
+    if (shouldAutoScroll) {
       scrollToBottom();
     }
   }, [messages, status, shouldAutoScroll, scrollToBottom]);
@@ -92,7 +92,6 @@ export function Chat({ initialMessages }: ChatProps) {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <ChatInput
             onSendMessage={handleSendMessageWithAutoScroll}
-            disabled={status === "streaming"}
             status={status}
             error={error}
             onStop={handleStop}
