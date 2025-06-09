@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
+import { useChat } from "@ai-sdk/react";
 
 export interface Message {
   id: string;
@@ -10,90 +10,85 @@ export interface Message {
 }
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "demo-1",
-      content: "Hello! I'm your AI assistant. How can I help you today?",
-      role: "assistant",
-      timestamp: new Date(Date.now() - 300000), // 5 minutes ago
-    },
-    {
-      id: "demo-2",
-      content: "Hi there! Can you help me understand how React hooks work?",
-      role: "user",
-      timestamp: new Date(Date.now() - 280000), // 4 minutes 40 seconds ago
-    },
-    {
-      id: "demo-3",
-      content:
-        "Absolutely! React hooks are functions that let you use state and other React features in functional components. The most common ones are:\n\n• `useState` - for managing component state\n• `useEffect` - for side effects and lifecycle events\n• `useContext` - for consuming context\n• `useMemo` and `useCallback` - for performance optimization\n\nWould you like me to explain any of these in more detail?",
-      role: "assistant",
-      timestamp: new Date(Date.now() - 260000), // 4 minutes 20 seconds ago
-    },
-    {
-      id: "demo-4",
-      content:
-        "That's really helpful! Can you show me a simple useState example?",
-      role: "user",
-      timestamp: new Date(Date.now() - 180000), // 3 minutes ago
-    },
-    {
-      id: "demo-5",
-      content:
-        "Sure! Here's a simple counter example using useState:\n\n```jsx\nimport { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n}\n```\n\nThe `useState` hook returns an array with two elements: the current state value and a function to update it. You can destructure these into meaningful variable names.",
-      role: "assistant",
-      timestamp: new Date(Date.now() - 120000), // 2 minutes ago
-    },
-    {
-      id: "demo-6",
-      content:
-        "Perfect! This makes so much sense now. Thank you for the clear explanation!",
-      role: "user",
-      timestamp: new Date(Date.now() - 60000), // 1 minute ago
-    },
-    {
-      id: "demo-7",
-      content:
-        "You're very welcome! I'm glad I could help clarify React hooks for you. Feel free to ask if you have any more questions about React or anything else!",
-      role: "assistant",
-      timestamp: new Date(Date.now() - 30000), // 30 seconds ago
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { messages, input, setInput, append, status, error, reload, stop } =
+    useChat({
+      onResponse: response => {
+        console.log("Chat API Response:", response.status, response.statusText);
+      },
+      onError: error => {
+        console.error("Chat Error:", error);
+      },
+    });
 
-  const handleSendMessage = async (content: string) => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
+  async function handleSendMessage(content: string) {
+    await append({
+      role: "user",
       content,
-      role: "user",
-      timestamp: new Date(),
-    };
+    });
+  }
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
+  function handleInputChange(value: string) {
+    setInput(value);
+  }
 
-    // Simulate AI response (demo)
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: `This is a demo response to: "${content}". In a real implementation, this would connect to your LLM API.`,
-        role: "assistant",
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1000);
-  };
+  function handleRetry() {
+    if (error) {
+      reload();
+    }
+  }
+
+  function handleStop() {
+    if (status === "streaming") {
+      stop();
+    }
+  }
+
+  // Convert AI SDK messages to our Message interface with timestamps
+  const messagesWithTimestamps: Message[] = messages.map((msg, index) => ({
+    id: msg.id,
+    content: msg.content,
+    role: msg.role as "user" | "assistant",
+    timestamp: new Date(Date.now() - (messages.length - index) * 60000),
+  }));
 
   return (
     <div className="flex flex-col h-full bg-background">
+      {/* Header with controls */}
+      <div className="flex-shrink-0 border-b bg-background">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex gap-2">
+            {/* Retry button - show when there's an error */}
+            {error && (
+              <button
+                onClick={handleRetry}
+                className="text-sm px-3 py-1 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
+              >
+                Retry
+              </button>
+            )}
+
+            {/* Stop button - show when streaming */}
+            {status === "streaming" && (
+              <button
+                onClick={handleStop}
+                className="text-sm px-3 py-1 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
+              >
+                Stop
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-          {messages.map(message => (
+          {messagesWithTimestamps.map(message => (
             <ChatMessage key={message.id} message={message} />
           ))}
-          {isLoading && (
+
+          {/* Loading indicator when streaming */}
+          {status === "streaming" && (
             <div className="flex justify-start">
               <div className="bg-muted rounded-lg p-3 max-w-xs lg:max-w-md">
                 <div className="flex space-x-1">
@@ -110,13 +105,84 @@ export function Chat() {
               </div>
             </div>
           )}
+
+          {/* Error message */}
+          {error && (
+            <div className="flex justify-center">
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 max-w-md">
+                <div className="flex items-center gap-2 text-destructive">
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="font-medium">Error occurred</span>
+                </div>
+                <p className="text-sm text-destructive/80 mt-1">
+                  {error.message || "Failed to get response from AI assistant"}
+                </p>
+                <button
+                  onClick={handleRetry}
+                  className="text-sm text-destructive underline hover:no-underline mt-2"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {messages.length === 0 && (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-center text-muted-foreground">
+                <p className="text-lg font-medium">Start a conversation</p>
+                <p className="text-sm">
+                  Ask me anything and I'll help you out!
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Status indicator */}
+      <div className="flex-shrink-0 px-4 py-1">
+        <div className="max-w-4xl mx-auto">
+          {status === "streaming" && (
+            <div className="text-xs text-muted-foreground flex items-center gap-2">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+              AI is thinking...
+            </div>
+          )}
+          {status === "ready" && messages.length > 0 && (
+            <div className="text-xs text-muted-foreground">Ready to chat</div>
+          )}
         </div>
       </div>
 
       {/* Input Area - Fixed at bottom */}
       <div className="flex-shrink-0 border-t bg-background">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
+          <ChatInput
+            value={input}
+            onChange={handleInputChange}
+            onSendMessage={handleSendMessage}
+            disabled={status === "streaming"}
+            placeholder={
+              error
+                ? "Fix the error above and try again..."
+                : "Type your message here..."
+            }
+          />
         </div>
       </div>
     </div>
