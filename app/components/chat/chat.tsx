@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { useChat } from "@ai-sdk/react";
+import { Button } from "@/components/ui/button";
 
 export interface Message {
   id: string;
@@ -10,8 +13,43 @@ export interface Message {
 }
 
 export function Chat() {
-  const { messages, input, setInput, append, status, error, reload, stop } =
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const { messages, append, status, error, reload, stop, setMessages } =
     useChat({
+      initialMessages: [
+        {
+          id: "demo-1",
+          content: "Hello! I'm your AI assistant. How can I help you today?",
+          role: "assistant",
+        },
+        {
+          id: "demo-2",
+          content: "Hi there! Can you help me understand how React hooks work?",
+          role: "user",
+        },
+        {
+          id: "demo-3",
+          content:
+            "Absolutely! React hooks are functions that let you use state and other React features in functional components. The most common ones are:\n\n• `useState` - for managing component state\n• `useEffect` - for side effects and lifecycle events\n• `useContext` - for consuming context\n• `useMemo` and `useCallback` - for performance optimization\n\nWould you like me to explain any of these in more detail?",
+          role: "assistant",
+        },
+        {
+          id: "demo-4",
+          content:
+            "That's really helpful! Can you show me a simple useState example?",
+          role: "user",
+        },
+        {
+          id: "demo-5",
+          content:
+            "Sure! Here's a simple counter example using useState:\n\n```jsx\nimport { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n}\n```\n\nThe `useState` hook returns an array with two elements: the current state value and a function to update it. You can destructure these into meaningful variable names.",
+          role: "assistant",
+        },
+      ],
       onResponse: response => {
         console.log("Chat API Response:", response.status, response.statusText);
       },
@@ -20,19 +58,9 @@ export function Chat() {
       },
     });
 
-  async function handleSendMessage(content: string) {
-    await append({
-      role: "user",
-      content,
-    });
-  }
-
-  function handleInputChange(value: string) {
-    setInput(value);
-  }
-
-  function handleRetry() {
+  function handleGlobalRetry() {
     if (error) {
+      setShouldAutoScroll(true);
       reload();
     }
   }
@@ -43,7 +71,80 @@ export function Chat() {
     }
   }
 
-  // Convert AI SDK messages to our Message interface with timestamps
+  function scrollToBottom(smooth = true) {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: smooth ? "smooth" : "instant",
+      block: "end",
+    });
+  }
+
+  function checkIfAtBottom() {
+    if (!scrollAreaRef.current) return false;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
+    const threshold = 100;
+    return scrollHeight - scrollTop - clientHeight < threshold;
+  }
+
+  function handleScroll() {
+    const atBottom = checkIfAtBottom();
+    setIsAtBottom(atBottom);
+
+    if (!atBottom) {
+      setShouldAutoScroll(false);
+    }
+  }
+
+  useEffect(() => {
+    if (shouldAutoScroll || status === "streaming") {
+      scrollToBottom();
+    }
+  }, [messages, status, shouldAutoScroll]);
+
+  useEffect(() => {
+    if (isAtBottom) {
+      setShouldAutoScroll(true);
+    }
+  }, [isAtBottom]);
+
+  async function handleSendMessage(content: string) {
+    setShouldAutoScroll(true);
+    await append({
+      role: "user",
+      content,
+    });
+  }
+
+  function handleMessageRetry(messageId: string) {
+    const messageIndex = messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1) return;
+
+    const messageToRetry = messages[messageIndex];
+
+    if (messageToRetry.role === "assistant") {
+      const truncatedMessages = messages.slice(0, messageIndex);
+      setMessages(truncatedMessages);
+
+      if (truncatedMessages.length > 0) {
+        const lastMessage = truncatedMessages[truncatedMessages.length - 1];
+        if (lastMessage.role === "user") {
+          setShouldAutoScroll(true);
+          setTimeout(() => {
+            reload();
+          }, 0);
+        }
+      }
+    } else {
+      const truncatedMessages = messages.slice(0, messageIndex);
+      setMessages(truncatedMessages);
+    }
+  }
+
+  function handleJumpToBottom() {
+    setShouldAutoScroll(true);
+    scrollToBottom();
+  }
+
   const messagesWithTimestamps: Message[] = messages.map((msg, index) => ({
     id: msg.id,
     content: msg.content,
@@ -52,42 +153,22 @@ export function Chat() {
   }));
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header with controls */}
-      <div className="flex-shrink-0 border-b bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex gap-2">
-            {/* Retry button - show when there's an error */}
-            {error && (
-              <button
-                onClick={handleRetry}
-                className="text-sm px-3 py-1 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
-              >
-                Retry
-              </button>
-            )}
-
-            {/* Stop button - show when streaming */}
-            {status === "streaming" && (
-              <button
-                onClick={handleStop}
-                className="text-sm px-3 py-1 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
-              >
-                Stop
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto min-h-0">
+    <div className="flex flex-col h-full bg-background relative">
+      <div
+        ref={scrollAreaRef}
+        className="flex-1 overflow-y-auto min-h-0"
+        onScroll={handleScroll}
+      >
         <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
           {messagesWithTimestamps.map(message => (
-            <ChatMessage key={message.id} message={message} />
+            <ChatMessage
+              key={message.id}
+              message={message}
+              onRetry={handleMessageRetry}
+              canRetry={status !== "streaming"}
+            />
           ))}
 
-          {/* Loading indicator when streaming */}
           {status === "streaming" && (
             <div className="flex justify-start">
               <div className="bg-muted rounded-lg p-3 max-w-xs lg:max-w-md">
@@ -106,7 +187,6 @@ export function Chat() {
             </div>
           )}
 
-          {/* Error message */}
           {error && (
             <div className="flex justify-center">
               <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 max-w-md">
@@ -130,17 +210,10 @@ export function Chat() {
                 <p className="text-sm text-destructive/80 mt-1">
                   {error.message || "Failed to get response from AI assistant"}
                 </p>
-                <button
-                  onClick={handleRetry}
-                  className="text-sm text-destructive underline hover:no-underline mt-2"
-                >
-                  Try again
-                </button>
               </div>
             </div>
           )}
 
-          {/* Empty state */}
           {messages.length === 0 && (
             <div className="flex justify-center items-center h-32">
               <div className="text-center text-muted-foreground">
@@ -151,37 +224,32 @@ export function Chat() {
               </div>
             </div>
           )}
+
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Status indicator */}
-      <div className="flex-shrink-0 px-4 py-1">
-        <div className="max-w-4xl mx-auto">
-          {status === "streaming" && (
-            <div className="text-xs text-muted-foreground flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-              AI is thinking...
-            </div>
-          )}
-          {status === "ready" && messages.length > 0 && (
-            <div className="text-xs text-muted-foreground">Ready to chat</div>
-          )}
+      {!isAtBottom && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10">
+          <Button
+            onClick={handleJumpToBottom}
+            className="flex items-center justify-center"
+            title="Jump to bottom"
+          >
+            <ChevronDown className="h-4 w-4" /> Jump to bottom
+          </Button>
         </div>
-      </div>
+      )}
 
-      {/* Input Area - Fixed at bottom */}
       <div className="flex-shrink-0 border-t bg-background">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <ChatInput
-            value={input}
-            onChange={handleInputChange}
             onSendMessage={handleSendMessage}
             disabled={status === "streaming"}
-            placeholder={
-              error
-                ? "Fix the error above and try again..."
-                : "Type your message here..."
-            }
+            status={status}
+            error={error}
+            onStop={handleStop}
+            onRetry={handleGlobalRetry}
           />
         </div>
       </div>

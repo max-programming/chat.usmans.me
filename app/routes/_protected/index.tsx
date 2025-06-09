@@ -16,15 +16,20 @@ function ChatInterface() {
 
   return (
     <div className="h-screen flex flex-col max-h-screen overflow-hidden">
-      {/* Top bar with user info and logout */}
       <div className="flex-shrink-0 flex justify-between items-center p-4 border-b bg-card">
-        <p className="text-sm text-muted-foreground">
-          Welcome, {data.user.email}
-        </p>
-        <LogoutButton />
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-semibold text-foreground">
+            Chat Assistant
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Welcome, {data.user.email}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <LogoutButton />
+        </div>
       </div>
 
-      {/* Chat interface */}
       <div className="flex-1 min-h-0">
         <Chat />
       </div>

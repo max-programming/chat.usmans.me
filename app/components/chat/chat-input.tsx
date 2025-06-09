@@ -1,30 +1,52 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send } from "lucide-react";
+import { Send, Square, RotateCcw } from "lucide-react";
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage(message: string): void;
   disabled?: boolean;
+  status?: "submitted" | "streaming" | "ready" | "error";
+  error?: Error;
+  onStop?: () => void;
+  onRetry?: () => void;
 }
 
-export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
+export function ChatInput({
+  onSendMessage,
+  disabled = false,
+  status = "ready",
+  error,
+  onStop,
+  onRetry,
+}: ChatInputProps) {
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (message.trim() && !disabled) {
+    if (message.trim() && !disabled && status !== "streaming") {
       onSendMessage(message.trim());
       setMessage("");
     }
-  };
+  }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
-  };
+  }
+
+  function handleStop() {
+    onStop?.();
+  }
+
+  function handleRetry() {
+    onRetry?.();
+  }
+
+  const isStreaming = status === "streaming";
+  const hasError = !!error;
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-3 items-end">
@@ -34,19 +56,48 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
           onChange={e => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)"
-          disabled={disabled}
+          disabled={disabled || isStreaming}
           className="min-h-[50px] max-h-[120px] resize-none"
           rows={1}
         />
       </div>
-      <Button
-        type="submit"
-        disabled={!message.trim() || disabled}
-        size="icon"
-        className="h-[50px] w-[50px] flex-shrink-0"
-      >
-        <Send className="h-4 w-4" />
-      </Button>
+
+      <div className="flex gap-2 items-end">
+        {hasError && !isStreaming && (
+          <Button
+            type="button"
+            onClick={handleRetry}
+            size="icon"
+            variant="outline"
+            className="h-[50px] w-[50px] flex-shrink-0"
+            title="Retry last message"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        )}
+
+        {isStreaming ? (
+          <Button
+            type="button"
+            onClick={handleStop}
+            size="icon"
+            variant="secondary"
+            className="h-[50px] w-[50px] flex-shrink-0"
+            title="Stop generating"
+          >
+            <Square className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            disabled={!message.trim() || disabled}
+            size="icon"
+            className="h-[50px] w-[50px] flex-shrink-0"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
     </form>
   );
 }
