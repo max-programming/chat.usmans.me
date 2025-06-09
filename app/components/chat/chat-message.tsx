@@ -27,13 +27,7 @@ export function ChatMessage({
       <div className="flex justify-end">
         <div className="max-w-xs lg:max-w-md">
           <div className="rounded-lg p-3 bg-zinc-800 text-zinc-100">
-            {message.role === "user" ? (
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                {message.content}
-              </div>
-            ) : (
-              <Markdown content={message.content} className="text-sm" />
-            )}
+            <Markdown content={message.content} className="text-sm" />
             <p className="text-xs mt-1 opacity-70">
               {message.timestamp.toLocaleTimeString([], {
                 hour: "2-digit",
