@@ -41,7 +41,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.513.0",
     "postcss": "^8.5.4",
-    "@shikijs/rehype": "^1.26.0",
+    "rehype-highlight": "^7.0.1",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",

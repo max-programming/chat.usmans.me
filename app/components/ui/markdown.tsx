@@ -1,9 +1,9 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
-import rehypeShiki from "@shikijs/rehype";
+import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
 import { cn } from "@/lib/utils";
 
@@ -13,55 +13,24 @@ interface MarkdownProps {
 }
 
 export function Markdown({ content, className }: MarkdownProps) {
-  const [htmlContent, setHtmlContent] = useState<string>("");
-  const [isProcessing, setIsProcessing] = useState(false);
-
   const processor = useMemo(() => {
     return unified()
       .use(remarkParse)
       .use(remarkGfm)
       .use(remarkRehype, { allowDangerousHtml: false })
-      .use(rehypeShiki, {
-        theme: "dark-plus",
-      })
+      .use(rehypeHighlight)
       .use(rehypeStringify);
   }, []);
 
-  useEffect(() => {
-    async function processMarkdown() {
-      if (!content.trim()) {
-        setHtmlContent("");
-        return;
-      }
-
-      setIsProcessing(true);
-      try {
-        const result = await processor.process(content);
-        setHtmlContent(String(result));
-      } catch (error) {
-        console.error("Error processing markdown:", error);
-        setHtmlContent(content);
-      } finally {
-        setIsProcessing(false);
-      }
+  const htmlContent = useMemo(() => {
+    try {
+      const result = processor.processSync(content);
+      return String(result);
+    } catch (error) {
+      console.error("Error processing markdown:", error);
+      return content;
     }
-
-    processMarkdown();
   }, [processor, content]);
-
-  if (isProcessing) {
-    return (
-      <div
-        className={cn(
-          "prose prose-sm dark:prose-invert max-w-none",
-          "prose-p:leading-relaxed",
-          className
-        )}
-      >
-        <p className="text-muted-foreground">Processing markdown...</p>
-      </div>
-    );
-  }
 
   return (
     <div
