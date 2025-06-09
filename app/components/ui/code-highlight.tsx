@@ -9,12 +9,12 @@ interface CodeHighlightProps {
   node?: Element | undefined;
 }
 
-export const CodeHighlight = ({
+export function CodeHighlight({
   className,
   children,
   node,
   ...props
-}: CodeHighlightProps) => {
+}: CodeHighlightProps) {
   const match = className?.match(/language-(\w+)/);
   const language = match ? match[1] : undefined;
   const code = String(children).trim();
@@ -24,7 +24,7 @@ export const CodeHighlight = ({
   return !isInline ? (
     <div className="relative">
       <div className="bg-muted/50 px-2 py-1 rounded-t-md flex items-center justify-between absolute top-0 w-full z-10">
-        <div>{language}</div>
+        <div className="pl-3">{language}</div>
         <div>
           <Button variant="ghost" className="size-7">
             <Copy />
@@ -33,9 +33,9 @@ export const CodeHighlight = ({
       </div>
       <ShikiHighlighter
         language={language}
-        theme="night-owl"
+        theme="catppuccin-mocha"
         delay={150}
-        showLineNumbers
+        // showLineNumbers
         showLanguage={false}
         defaultColor="dark"
         {...props}
@@ -46,4 +46,4 @@ export const CodeHighlight = ({
   ) : (
     <code className={className}>{code}</code>
   );
-};
+}
