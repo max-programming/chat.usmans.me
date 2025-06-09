@@ -156,4 +156,53 @@
   *::-webkit-scrollbar-corner {
     background: transparent;
   }
+
+  /* Syntax highlighting styles for rehype-highlight */
+  .hljs {
+    @apply text-foreground;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-literal,
+  .hljs-title,
+  .hljs-section,
+  .hljs-doctag,
+  .hljs-type,
+  .hljs-name,
+  .hljs-strong {
+    @apply font-semibold text-blue-600 dark:text-blue-400;
+  }
+
+  .hljs-string,
+  .hljs-title.function_,
+  .hljs-attr,
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-addition {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .hljs-comment,
+  .hljs-quote,
+  .hljs-deletion {
+    @apply text-muted-foreground italic;
+  }
+
+  .hljs-number,
+  .hljs-regexp,
+  .hljs-literal {
+    @apply text-purple-600 dark:text-purple-400;
+  }
+
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-attribute {
+    @apply text-orange-600 dark:text-orange-400;
+  }
+
+  .hljs-meta,
+  .hljs-meta .hljs-keyword {
+    @apply text-red-600 dark:text-red-400;
+  }
 }

@@ -1,5 +1,10 @@
 import { useMemo } from "react";
-import MarkdownIt from "markdown-it";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeHighlight from "rehype-highlight";
+import rehypeStringify from "rehype-stringify";
 import { cn } from "@/lib/utils";
 
 interface MarkdownProps {
@@ -8,18 +13,24 @@ interface MarkdownProps {
 }
 
 export function Markdown({ content, className }: MarkdownProps) {
-  const md = useMemo(() => {
-    return new MarkdownIt({
-      html: false,
-      breaks: true,
-      linkify: true,
-      typographer: true,
-    });
+  const processor = useMemo(() => {
+    return unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkRehype, { allowDangerousHtml: false })
+      .use(rehypeHighlight)
+      .use(rehypeStringify);
   }, []);
 
   const htmlContent = useMemo(() => {
-    return md.render(content);
-  }, [md, content]);
+    try {
+      const result = processor.processSync(content);
+      return String(result);
+    } catch (error) {
+      console.error("Error processing markdown:", error);
+      return content;
+    }
+  }, [processor, content]);
 
   return (
     <div
