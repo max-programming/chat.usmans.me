@@ -3,18 +3,20 @@ import { Copy, RotateCcw } from "lucide-react";
 import type { Message } from "@/hooks/use-chat-messages";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "../ui/button";
-import { Markdown } from "../ui/markdown";
+import { StreamingMarkdown } from "../ui/streaming-markdown";
 
 interface ChatMessageProps {
-  message: Message;
+  message: Message & { processedContent?: string };
   onRetry?(messageId: string): void;
   canRetry?: boolean;
+  isStreaming?: boolean;
 }
 
 export function ChatMessage({
   message,
   onRetry,
   canRetry = false,
+  isStreaming = false,
 }: ChatMessageProps) {
   const [, copyToClipboard] = useCopyToClipboard();
   const isUser = message.role === "user";
@@ -28,7 +30,18 @@ export function ChatMessage({
       <div className="flex justify-end">
         <div className="max-w-xs lg:max-w-md">
           <div className="rounded-lg p-3 bg-zinc-800 text-zinc-100">
-            <Markdown content={message.content} className="text-sm" />
+            {message.role === "user" ? (
+              <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                {message.content}
+              </div>
+            ) : (
+              <StreamingMarkdown
+                content={message.content}
+                processedContent={message.processedContent}
+                isStreaming={isStreaming}
+                className="text-sm"
+              />
+            )}
             <p className="text-xs mt-1 opacity-70">
               {message.timestamp.toLocaleTimeString([], {
                 hour: "2-digit",
@@ -66,7 +79,11 @@ export function ChatMessage({
   return (
     <div className="w-full">
       <div className="mb-2">
-        <Markdown content={message.content} />
+        <StreamingMarkdown
+          content={message.content}
+          processedContent={message.processedContent}
+          isStreaming={isStreaming && message.role === "assistant"}
+        />
         <p className="text-xs mt-2 opacity-70">
           {message.timestamp.toLocaleTimeString([], {
             hour: "2-digit",

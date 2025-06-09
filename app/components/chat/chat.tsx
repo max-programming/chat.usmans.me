@@ -8,7 +8,17 @@ import { JumpToBottom } from "./jump-to-bottom";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useChatMessages } from "@/hooks/use-chat-messages";
 
-export function Chat() {
+interface ChatProps {
+  initialMessages?: Array<{
+    id: string;
+    content: string;
+    role: "user" | "assistant";
+    timestamp: Date;
+    processedContent?: string;
+  }>;
+}
+
+export function Chat({ initialMessages }: ChatProps) {
   const {
     messages,
     status,
@@ -17,7 +27,7 @@ export function Chat() {
     handleMessageRetry,
     handleGlobalRetry,
     handleStop,
-  } = useChatMessages();
+  } = useChatMessages({ initialMessages });
 
   const {
     isAtBottom,
@@ -59,12 +69,15 @@ export function Chat() {
         onScroll={handleScroll}
       >
         <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-          {messages.map(message => (
+          {messages.map((message, index) => (
             <ChatMessage
               key={message.id}
               message={message}
               onRetry={handleMessageRetryWithAutoScroll}
               canRetry={status !== "streaming"}
+              isStreaming={
+                status === "streaming" && index === messages.length - 1
+              }
             />
           ))}
 
