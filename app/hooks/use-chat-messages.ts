@@ -10,36 +10,36 @@ export interface Message {
 export function useChatMessages() {
   const { messages, append, status, error, reload, stop, setMessages } =
     useChat({
-      initialMessages: [
-        {
-          id: "demo-1",
-          content: "Hello! I'm your AI assistant. How can I help you today?",
-          role: "assistant",
-        },
-        {
-          id: "demo-2",
-          content: "Hi there! Can you help me understand how React hooks work?",
-          role: "user",
-        },
-        {
-          id: "demo-3",
-          content:
-            "Absolutely! React hooks are functions that let you use state and other React features in functional components. The most common ones are:\n\n• `useState` - for managing component state\n• `useEffect` - for side effects and lifecycle events\n• `useContext` - for consuming context\n• `useMemo` and `useCallback` - for performance optimization\n\nWould you like me to explain any of these in more detail?",
-          role: "assistant",
-        },
-        {
-          id: "demo-4",
-          content:
-            "That's really helpful! Can you show me a simple useState example?",
-          role: "user",
-        },
-        {
-          id: "demo-5",
-          content:
-            "Sure! Here's a simple counter example using useState:\n\n```jsx\nimport { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n}\n```\n\nThe `useState` hook returns an array with two elements: the current state value and a function to update it. You can destructure these into meaningful variable names.",
-          role: "assistant",
-        },
-      ],
+      // initialMessages: [
+      //   {
+      //     id: "demo-1",
+      //     content: "Hello! I'm your AI assistant. How can I help you today?",
+      //     role: "assistant",
+      //   },
+      //   {
+      //     id: "demo-2",
+      //     content: "Hi there! Can you help me understand how React hooks work?",
+      //     role: "user",
+      //   },
+      //   {
+      //     id: "demo-3",
+      //     content:
+      //       "Absolutely! React hooks are functions that let you use state and other React features in functional components. The most common ones are:\n\n• `useState` - for managing component state\n• `useEffect` - for side effects and lifecycle events\n• `useContext` - for consuming context\n• `useMemo` and `useCallback` - for performance optimization\n\nWould you like me to explain any of these in more detail?",
+      //     role: "assistant",
+      //   },
+      //   {
+      //     id: "demo-4",
+      //     content:
+      //       "That's really helpful! Can you show me a simple useState example?",
+      //     role: "user",
+      //   },
+      //   {
+      //     id: "demo-5",
+      //     content:
+      //       "Sure! Here's a simple counter example using useState:\n\n```jsx\nimport { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n}\n```\n\nThe `useState` hook returns an array with two elements: the current state value and a function to update it. You can destructure these into meaningful variable names.",
+      //     role: "assistant",
+      //   },
+      // ],
       onResponse: response => {
         console.log("Chat API Response:", response.status, response.statusText);
       },

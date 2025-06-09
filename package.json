@@ -9,7 +9,9 @@
     "start": "vinxi start"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
     "@types/bun": "latest",
+    "@types/markdown-it": "^14.1.2",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.1",
@@ -39,6 +41,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.513.0",
+    "markdown-it": "^14.1.0",
     "postcss": "^8.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
