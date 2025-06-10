@@ -1,23 +1,40 @@
-import { useChat } from "@ai-sdk/react";
-
-export interface Message {
-  id: string;
-  content: string;
-  role: "user" | "assistant";
-  timestamp: Date;
-  processedContent?: string;
-}
+import { useNewChat } from "@/lib/mutations/use-new-chat";
+import { useNewMessage } from "@/lib/mutations/use-new-message";
+import { chatStore, startNewChat } from "@/lib/stores/chat.store";
+import { useChat, type Message } from "@ai-sdk/react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useStore } from "@tanstack/react-store";
 
 interface UseChatMessagesProps {
   initialMessages?: Message[];
+  chatId?: string;
 }
 
 export function useChatMessages({
   initialMessages = [],
-}: UseChatMessagesProps = {}) {
-  const { messages, append, status, error, reload, stop, setMessages } =
+  chatId,
+}: UseChatMessagesProps) {
+  const isNew = useStore(chatStore, s => s.isNew);
+
+  const pathname = useLocation({ select: l => l.pathname });
+  const navigate = useNavigate();
+
+  const { mutate: newMessage } = useNewMessage();
+  const { mutate: newChat } = useNewChat();
+
+  const { messages, append, status, error, reload, stop, setMessages, id } =
     useChat({
       initialMessages,
+      id: chatId,
+      onFinish(message, options) {
+        newMessage({
+          chatId: id,
+          content: message.content,
+          role: message.role,
+          tokenCount: options.usage.completionTokens,
+          messageId: message.id,
+        });
+      },
       onResponse: response => {
         console.log("Chat API Response:", response.status, response.statusText);
       },
@@ -39,10 +56,25 @@ export function useChatMessages({
   }
 
   async function handleSendMessage(content: string) {
-    await append({
-      role: "user",
-      content,
-    });
+    if (pathname === "/") {
+      const newChatId = startNewChat(content);
+      navigate({
+        to: "/chat/$chatId",
+        params: { chatId: newChatId },
+      });
+    } else {
+      const promises = [];
+      if (isNew) {
+        promises.push(newChat({ chatId: id, message: content }));
+      }
+      promises.push(
+        append({
+          role: "user",
+          content,
+        })
+      );
+      await Promise.all(promises);
+    }
   }
 
   function handleMessageRetry(messageId: string) {
@@ -69,25 +101,8 @@ export function useChatMessages({
     }
   }
 
-  const messagesWithTimestamps: Message[] = messages.map((msg, index) => {
-    // Find corresponding initial message with processedContent
-    const initialMessage = initialMessages.find(
-      initial => initial.id === msg.id
-    );
-
-    return {
-      id: msg.id,
-      content: msg.content,
-      role: msg.role as "user" | "assistant",
-      timestamp:
-        initialMessage?.timestamp ||
-        new Date(Date.now() - (messages.length - index) * 60000),
-      processedContent: initialMessage?.processedContent,
-    };
-  });
-
   return {
-    messages: messagesWithTimestamps,
+    messages,
     status,
     error,
     handleSendMessage,

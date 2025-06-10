@@ -7,18 +7,19 @@ import { ChatEmpty } from "./chat-empty";
 import { JumpToBottom } from "./jump-to-bottom";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useChatMessages } from "@/hooks/use-chat-messages";
+import { useStore } from "@tanstack/react-store";
+import { chatStore } from "@/lib/stores/chat.store";
+import { useSingleEffect } from "@/hooks/use-single-effect";
+import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
 
 interface ChatProps {
-  initialMessages?: Array<{
-    id: string;
-    content: string;
-    role: "user" | "assistant";
-    timestamp: Date;
-    processedContent?: string;
-  }>;
+  chatId: string;
+  initialMessages?: ChatWithMessages["messages"];
 }
 
-export function Chat({ initialMessages }: ChatProps) {
+export function Chat({ initialMessages, chatId }: ChatProps) {
+  const { initialMessage, isNew } = useStore(chatStore);
+
   const {
     messages,
     status,
@@ -27,7 +28,7 @@ export function Chat({ initialMessages }: ChatProps) {
     handleMessageRetry,
     handleGlobalRetry,
     handleStop,
-  } = useChatMessages({ initialMessages });
+  } = useChatMessages({ initialMessages, chatId });
 
   const {
     isAtBottom,
@@ -45,6 +46,12 @@ export function Chat({ initialMessages }: ChatProps) {
       scrollToBottom();
     }
   }, [messages, status, shouldAutoScroll, scrollToBottom]);
+
+  useSingleEffect(() => {
+    if (!isNew) return;
+    if (initialMessage.trim() === "") return;
+    handleSendMessage(initialMessage);
+  });
 
   async function handleSendMessageWithAutoScroll(content: string) {
     enableAutoScroll();
@@ -78,7 +85,8 @@ export function Chat({ initialMessages }: ChatProps) {
             />
           ))}
 
-          {status === "streaming" && <ChatLoading />}
+          {status === "streaming" ||
+            (status === "submitted" && <ChatLoading />)}
           {error && <ChatError error={error} />}
           {messages.length === 0 && <ChatEmpty />}
 

@@ -18,6 +18,7 @@ import { Route as AuthErrorImport } from './routes/auth/error'
 import { Route as AuthConfirmImport } from './routes/auth/confirm'
 import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
+import { Route as ProtectedChatChatIdImport } from './routes/_protected/chat/$chatId'
 
 // Create/Update Routes
 
@@ -59,6 +60,12 @@ const AuthLoginRoute = AuthLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
+} as any)
+
+const ProtectedChatChatIdRoute = ProtectedChatChatIdImport.update({
+  id: '/chat/$chatId',
+  path: '/chat/$chatId',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -114,6 +121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedIndexImport
       parentRoute: typeof ProtectedImport
     }
+    '/_protected/chat/$chatId': {
+      id: '/_protected/chat/$chatId'
+      path: '/chat/$chatId'
+      fullPath: '/chat/$chatId'
+      preLoaderRoute: typeof ProtectedChatChatIdImport
+      parentRoute: typeof ProtectedImport
+    }
   }
 }
 
@@ -133,10 +147,12 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProtectedRouteChildren {
   ProtectedIndexRoute: typeof ProtectedIndexRoute
+  ProtectedChatChatIdRoute: typeof ProtectedChatChatIdRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedIndexRoute: ProtectedIndexRoute,
+  ProtectedChatChatIdRoute: ProtectedChatChatIdRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -150,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/': typeof ProtectedIndexRoute
+  '/chat/$chatId': typeof ProtectedChatChatIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -159,6 +176,7 @@ export interface FileRoutesByTo {
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/': typeof ProtectedIndexRoute
+  '/chat/$chatId': typeof ProtectedChatChatIdRoute
 }
 
 export interface FileRoutesById {
@@ -170,13 +188,28 @@ export interface FileRoutesById {
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/_protected/': typeof ProtectedIndexRoute
+  '/_protected/chat/$chatId': typeof ProtectedChatChatIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/register' | '/auth/confirm' | '/auth/error' | '/'
+  fullPaths:
+    | ''
+    | '/login'
+    | '/register'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/'
+    | '/chat/$chatId'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/login' | '/register' | '/auth/confirm' | '/auth/error' | '/'
+  to:
+    | ''
+    | '/login'
+    | '/register'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/'
+    | '/chat/$chatId'
   id:
     | '__root__'
     | '/_auth'
@@ -186,6 +219,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/auth/error'
     | '/_protected/'
+    | '/_protected/chat/$chatId'
   fileRoutesById: FileRoutesById
 }
 
@@ -229,7 +263,8 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected.tsx",
       "children": [
-        "/_protected/"
+        "/_protected/",
+        "/_protected/chat/$chatId"
       ]
     },
     "/_auth/login": {
@@ -248,6 +283,10 @@ export const routeTree = rootRoute
     },
     "/_protected/": {
       "filePath": "_protected/index.tsx",
+      "parent": "/_protected"
+    },
+    "/_protected/chat/$chatId": {
+      "filePath": "_protected/chat/$chatId.tsx",
       "parent": "/_protected"
     }
   }

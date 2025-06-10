@@ -1,5 +1,5 @@
 import { Copy, RotateCcw } from "lucide-react";
-import type { Message } from "@/hooks/use-chat-messages";
+import type { Message } from "ai";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "../ui/button";
 import { Markdown } from "../ui/markdown";
@@ -29,7 +29,7 @@ export function ChatMessage({
           <div className="rounded-lg p-3 bg-muted">
             <Markdown content={message.content} className="text-sm" />
             <p className="text-xs mt-1 opacity-70">
-              {message.timestamp.toLocaleTimeString([], {
+              {message.createdAt?.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -67,7 +67,7 @@ export function ChatMessage({
       <div className="mb-2">
         <Markdown content={message.content} />
         <p className="text-xs mt-2 opacity-70">
-          {message.timestamp.toLocaleTimeString([], {
+          {message.createdAt?.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           })}
