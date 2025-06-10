@@ -1,5 +1,6 @@
 import { useNewChat } from "@/lib/mutations/use-new-chat";
 import { useNewMessage } from "@/lib/mutations/use-new-message";
+import { useUpdateChatTitle } from "@/lib/mutations/use-update-chat-title";
 import { chatStore, startNewChat } from "@/lib/stores/chat.store";
 import { useChat, type Message } from "@ai-sdk/react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -21,6 +22,7 @@ export function useChatMessages({
 
   const { mutate: newMessage } = useNewMessage();
   const { mutate: newChat } = useNewChat();
+  const { mutate: updateChatTitle } = useUpdateChatTitle();
 
   const { messages, append, status, error, reload, stop, setMessages, id } =
     useChat({
@@ -66,6 +68,14 @@ export function useChatMessages({
       const promises = [];
       if (isNew) {
         promises.push(newChat({ chatId: id, message: content }));
+      } else {
+        promises.push(
+          newMessage({
+            chatId: id,
+            content,
+            role: "user",
+          })
+        );
       }
       promises.push(
         append({

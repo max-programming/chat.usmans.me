@@ -13,7 +13,7 @@ export const APIRoute = createAPIFileRoute("/api/generate-title")({
     const result = streamText({
       model: openai("gpt-4o-mini"),
       system:
-        "You are a helpful assistant that generates a title for a chat. You only return the title, no other text, single sentence, no double quotes unless necessary.",
+        "You are a helpful assistant that generates a simple title for an LLM chat. You will be given an initial message from the user. You only return the title text and it should be short, single sentence, no fillers",
       prompt,
     });
 

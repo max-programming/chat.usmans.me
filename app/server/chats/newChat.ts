@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateId } from "ai";
 import { z } from "zod";
-import { newMessage } from "../messages/newMessage";
-import { chats } from "@/lib/db/schema";
+import { chats, messages } from "@/lib/db/schema";
 import { db } from "@/lib/db";
+import { authMiddleware } from "@/auth-middleware";
 
 const newChatSchema = z.object({
   message: z.string(),
@@ -14,20 +14,20 @@ export type NewChatInput = z.infer<typeof newChatSchema>;
 
 export const newChat = createServerFn({ method: "POST" })
   .validator(newChatSchema)
-  .handler(async ({ data: { chatId, message } }) => {
+  .middleware([authMiddleware])
+  .handler(async ({ data: { chatId, message }, context }) => {
     await db.insert(chats).values({
       id: chatId,
-      title: "Untitled Chat",
+      title: "New Chat",
+      userId: context.user.id,
     });
 
     const messageId = generateId();
-    await newMessage({
-      data: {
-        chatId,
-        content: message,
-        role: "user",
-        messageId,
-      },
+    await db.insert(messages).values({
+      id: messageId,
+      chatId,
+      content: message,
+      role: "user",
     });
 
     return { chatId, messageId };

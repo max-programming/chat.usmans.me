@@ -26,10 +26,10 @@ export const chats = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     userId: uuid("user_id").default(sql`auth.uid()`),
-    title: varchar(),
+    title: varchar().default("New Chat").notNull(),
     isArchived: boolean("is_archived").default(false),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },
   table => [
     foreignKey({
@@ -61,19 +61,22 @@ export const chats = pgTable(
   ]
 );
 
-const messageRole = customType<{ data: Message["role"] }>({
-  dataType: () => "varchar",
+const role = customType<{ data: Message["role"] }>({
+  dataType() {
+    return "varchar";
+  },
 });
+
 export const messages = pgTable(
   "messages",
   {
     id: varchar().primaryKey().notNull(),
     chatId: uuid("chat_id").notNull(),
-    role: messageRole().notNull(),
+    role: role().notNull(),
     content: text().notNull(),
     modelName: varchar("model_name"),
     tokenCount: integer("token_count"),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   },
   table => [
     index("messages_chat_id_created_at_idx").using(

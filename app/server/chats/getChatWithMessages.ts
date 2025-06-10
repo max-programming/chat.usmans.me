@@ -2,12 +2,14 @@ import { db } from "@/lib/db";
 import { chats, messages } from "@/lib/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
+import { authMiddleware } from "@/auth-middleware";
 
 export type ChatWithMessages = Awaited<ReturnType<typeof getChatWithMessages>>;
 export const getChatWithMessages = createServerFn({ method: "GET" })
   .validator(z.object({ chatId: z.string() }))
-  .handler(async ({ data: { chatId } }) => {
+  .middleware([authMiddleware])
+  .handler(async ({ data: { chatId }, context }) => {
     const chat = await db
       .select({
         id: chats.id,
@@ -22,15 +24,22 @@ export const getChatWithMessages = createServerFn({ method: "GET" })
         },
       })
       .from(chats)
-      .where(eq(chats.id, chatId))
+      .where(and(eq(chats.id, chatId), eq(chats.userId, context.user.id)))
       .innerJoin(messages, eq(chats.id, messages.chatId))
       .orderBy(asc(messages.createdAt));
 
+    if (chat.length === 0) {
+      return {
+        chat: {
+          id: chatId,
+          title: "News Chat",
+        },
+        messages: [],
+      };
+    }
+
     return {
       chat: chat[0],
-      messages: chat.map(c => ({
-        ...c.message,
-        createdAt: new Date(c.message.createdAt ?? Date.now()),
-      })),
+      messages: chat.map(c => c.message),
     };
   });

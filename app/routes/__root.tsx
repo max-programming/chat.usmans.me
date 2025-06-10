@@ -6,25 +6,11 @@ import {
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 import appCss from "@/styles/app.css?url";
-import { createServerFn } from "@tanstack/react-start";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { QueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/server";
-
-const fetchUser = createServerFn({ method: "GET" }).handler(async () => {
-  const supabase = createClient();
-  const { data, error: _error } = await supabase.auth.getUser();
-
-  if (!data.user?.email) {
-    return null;
-  }
-
-  return {
-    id: data.user.id,
-    email: data.user.email,
-  };
-});
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { fetchUser } from "@/server/fetchUser";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -39,7 +25,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Max Programming - Image Viewer",
+        title: "Chat Assistant",
       },
     ],
     links: [
@@ -81,6 +67,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body className="dark">
         {children}
         <Scripts />
+        <ReactQueryDevtools initialIsOpen={false} />
       </body>
     </html>
   );
