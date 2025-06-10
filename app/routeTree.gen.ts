@@ -16,6 +16,7 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as ProtectedIndexImport } from './routes/_protected/index'
 import { Route as AuthErrorImport } from './routes/auth/error'
 import { Route as AuthConfirmImport } from './routes/auth/confirm'
+import { Route as ProtectedChatIdImport } from './routes/_protected/$chatId'
 import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
 
@@ -47,6 +48,12 @@ const AuthConfirmRoute = AuthConfirmImport.update({
   id: '/auth/confirm',
   path: '/auth/confirm',
   getParentRoute: () => rootRoute,
+} as any)
+
+const ProtectedChatIdRoute = ProtectedChatIdImport.update({
+  id: '/$chatId',
+  path: '/$chatId',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 
 const AuthRegisterRoute = AuthRegisterImport.update({
@@ -93,6 +100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterImport
       parentRoute: typeof AuthImport
     }
+    '/_protected/$chatId': {
+      id: '/_protected/$chatId'
+      path: '/$chatId'
+      fullPath: '/$chatId'
+      preLoaderRoute: typeof ProtectedChatIdImport
+      parentRoute: typeof ProtectedImport
+    }
     '/auth/confirm': {
       id: '/auth/confirm'
       path: '/auth/confirm'
@@ -132,10 +146,12 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProtectedRouteChildren {
+  ProtectedChatIdRoute: typeof ProtectedChatIdRoute
   ProtectedIndexRoute: typeof ProtectedIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedChatIdRoute: ProtectedChatIdRoute,
   ProtectedIndexRoute: ProtectedIndexRoute,
 }
 
@@ -147,6 +163,7 @@ export interface FileRoutesByFullPath {
   '': typeof ProtectedRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/$chatId': typeof ProtectedChatIdRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/': typeof ProtectedIndexRoute
@@ -156,6 +173,7 @@ export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
+  '/$chatId': typeof ProtectedChatIdRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/': typeof ProtectedIndexRoute
@@ -167,6 +185,7 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
+  '/_protected/$chatId': typeof ProtectedChatIdRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/_protected/': typeof ProtectedIndexRoute
@@ -174,15 +193,30 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/register' | '/auth/confirm' | '/auth/error' | '/'
+  fullPaths:
+    | ''
+    | '/login'
+    | '/register'
+    | '/$chatId'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/login' | '/register' | '/auth/confirm' | '/auth/error' | '/'
+  to:
+    | ''
+    | '/login'
+    | '/register'
+    | '/$chatId'
+    | '/auth/confirm'
+    | '/auth/error'
+    | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/_protected'
     | '/_auth/login'
     | '/_auth/register'
+    | '/_protected/$chatId'
     | '/auth/confirm'
     | '/auth/error'
     | '/_protected/'
@@ -229,6 +263,7 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected.tsx",
       "children": [
+        "/_protected/$chatId",
         "/_protected/"
       ]
     },
@@ -239,6 +274,10 @@ export const routeTree = rootRoute
     "/_auth/register": {
       "filePath": "_auth/register.tsx",
       "parent": "/_auth"
+    },
+    "/_protected/$chatId": {
+      "filePath": "_protected/$chatId.tsx",
+      "parent": "/_protected"
     },
     "/auth/confirm": {
       "filePath": "auth/confirm.tsx"
