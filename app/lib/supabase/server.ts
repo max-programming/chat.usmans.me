@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { parseCookies, setCookie } from "@tanstack/react-start/server";
+import type { Database } from "./database.types";
 
 export function createClient() {
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.VITE_SUPABASE_URL!,
     process.env.VITE_SUPABASE_ANON_KEY!,
     {
