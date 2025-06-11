@@ -2,7 +2,7 @@ import { authMiddleware } from "@/auth-middleware";
 import { db } from "@/lib/db";
 import { messages } from "@/lib/db/schema";
 import { createServerFn } from "@tanstack/react-start";
-import { generateId } from "ai";
+import { createIdGenerator } from "ai";
 import { z } from "zod";
 
 const newMessageSchema = z.object({
@@ -19,7 +19,13 @@ export const newMessage = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .handler(
     async ({
-      data: { chatId, content, role, tokenCount, messageId = generateId() },
+      data: {
+        chatId,
+        content,
+        role,
+        tokenCount,
+        messageId = generateMessageId(),
+      },
     }) => {
       await db.insert(messages).values({
         id: messageId,
@@ -32,3 +38,9 @@ export const newMessage = createServerFn({ method: "POST" })
       return { chatId, messageId };
     }
   );
+
+export const generateMessageId = createIdGenerator({
+  prefix: "msg",
+  separator: "-",
+  size: 24,
+});

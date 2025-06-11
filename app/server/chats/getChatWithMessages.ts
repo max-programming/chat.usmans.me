@@ -32,7 +32,7 @@ export const getChatWithMessages = createServerFn({ method: "GET" })
       return {
         chat: {
           id: chatId,
-          title: "News Chat",
+          title: "New Chat",
         },
         messages: [],
       };

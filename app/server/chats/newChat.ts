@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateId } from "ai";
 import { z } from "zod";
 import { chats, messages } from "@/lib/db/schema";
 import { db } from "@/lib/db";
 import { authMiddleware } from "@/auth-middleware";
+import { generateMessageId } from "../messages/newMessage";
 
 const newChatSchema = z.object({
   message: z.string(),
@@ -22,7 +22,7 @@ export const newChat = createServerFn({ method: "POST" })
       userId: context.user.id,
     });
 
-    const messageId = generateId();
+    const messageId = generateMessageId();
     await db.insert(messages).values({
       id: messageId,
       chatId,
