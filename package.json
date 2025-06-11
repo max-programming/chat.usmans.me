@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start",
+    "start": "bun run --env-file=.env vinxi start",
     "db:gen-types": "supabase gen types --project-id \"asxylwzwynukxitznvyn\" --schema public > app/lib/supabase/database.types.ts"
   },
   "devDependencies": {

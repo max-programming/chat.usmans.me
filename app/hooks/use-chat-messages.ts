@@ -63,6 +63,7 @@ export function useChatMessages({
       navigate({
         to: "/chat/$chatId",
         params: { chatId: newChatId },
+        search: { isNew: true },
       });
     } else {
       const promises = [];

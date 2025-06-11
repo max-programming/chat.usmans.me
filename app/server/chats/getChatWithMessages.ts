@@ -27,7 +27,6 @@ export const getChatWithMessages = createServerFn({ method: "GET" })
       .where(and(eq(chats.id, chatId), eq(chats.userId, context.user.id)))
       .innerJoin(messages, eq(chats.id, messages.chatId))
       .orderBy(asc(messages.createdAt));
-
     if (chat.length === 0) {
       return {
         chat: {

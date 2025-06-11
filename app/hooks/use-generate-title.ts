@@ -6,8 +6,8 @@ export function useGenerateTitle(chatId: string) {
 
   return useCompletion({
     api: "/api/generate-title",
-    onFinish(prompt, completion) {
-      console.log("onFinish", prompt, completion);
+    initialCompletion: "New Chat",
+    onFinish(_, completion) {
       updateChatTitle({
         chatId,
         title: completion,

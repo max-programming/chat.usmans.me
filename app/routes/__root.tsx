@@ -8,7 +8,7 @@ import {
 import appCss from "@/styles/app.css?url";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
-import { QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { fetchUser } from "@/server/fetchUser";
 
@@ -35,8 +35,11 @@ export const Route = createRootRouteWithContext<{
       },
     ],
   }),
-  async beforeLoad() {
-    const user = await fetchUser();
+  async beforeLoad({ context }) {
+    const user = await context.queryClient.fetchQuery({
+      queryKey: ["user"],
+      queryFn: fetchUser,
+    });
     return { user };
   },
   errorComponent: props => {

@@ -10,15 +10,28 @@ import { useChatMessages } from "@/hooks/use-chat-messages";
 import { useStore } from "@tanstack/react-store";
 import { chatStore } from "@/lib/stores/chat.store";
 import { useSingleEffect } from "@/hooks/use-single-effect";
-import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
+import { LogoutButton } from "../LogoutButton";
+import { SidebarTrigger } from "../ui/sidebar";
+import { useGenerateTitle } from "@/hooks/use-generate-title";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { queries } from "@/lib/queries";
 
 interface ChatProps {
   chatId: string;
-  initialMessages?: ChatWithMessages["messages"];
 }
 
-export function Chat({ initialMessages, chatId }: ChatProps) {
-  const { initialMessage, isNew } = useStore(chatStore);
+export function Chat({ chatId }: ChatProps) {
+  const {
+    data: { chat, messages: initialMessages },
+  } = useSuspenseQuery(queries.chats.withMessages(chatId));
+
+  const { initialMessage, isNew } = useStore(chatStore, s => ({
+    initialMessage: s.initialMessage,
+    isNew: s.isNew,
+  }));
+
+  const { complete: generateTitle, completion: generatedTitle } =
+    useGenerateTitle(chat.id);
 
   const {
     messages,
@@ -28,7 +41,7 @@ export function Chat({ initialMessages, chatId }: ChatProps) {
     handleMessageRetry,
     handleGlobalRetry,
     handleStop,
-  } = useChatMessages({ initialMessages, chatId });
+  } = useChatMessages({ initialMessages, chatId: chat.id });
 
   const {
     isAtBottom,
@@ -50,7 +63,10 @@ export function Chat({ initialMessages, chatId }: ChatProps) {
   useSingleEffect(() => {
     if (!isNew) return;
     if (initialMessage.trim() === "") return;
-    handleSendMessage(initialMessage);
+    (async () => {
+      await handleSendMessage(initialMessage);
+      generateTitle(initialMessage);
+    })();
   });
 
   async function handleSendMessageWithAutoScroll(content: string) {
@@ -69,44 +85,59 @@ export function Chat({ initialMessages, chatId }: ChatProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background relative">
-      <div
-        ref={scrollAreaRef}
-        className="flex-1 overflow-y-auto min-h-0"
-        onScroll={handleScroll}
-      >
-        <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-          {messages.map((message, index) => (
-            <ChatMessage
-              key={message.id}
-              message={message}
-              onRetry={handleMessageRetryWithAutoScroll}
-              canRetry={status !== "streaming"}
-            />
-          ))}
-
-          {status === "streaming" ||
-            (status === "submitted" && <ChatLoading />)}
-          {error && <ChatError error={error} />}
-          {messages.length === 0 && <ChatEmpty />}
-
-          <div ref={messagesEndRef} />
+    <>
+      <div className="flex-shrink-0 flex justify-between items-center p-4 border-b bg-card">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="-ml-1" />
+          <h1 className="text-xl font-semibold text-foreground">
+            {isNew ? generatedTitle : chat.title}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <LogoutButton />
         </div>
       </div>
+      <div className="flex-1 min-h-0">
+        <div className="flex flex-col h-full bg-background relative">
+          <div
+            ref={scrollAreaRef}
+            className="flex-1 overflow-y-auto min-h-0"
+            onScroll={handleScroll}
+          >
+            <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
+              {messages.map((message, index) => (
+                <ChatMessage
+                  key={message.id}
+                  message={message}
+                  onRetry={handleMessageRetryWithAutoScroll}
+                  canRetry={status !== "streaming"}
+                />
+              ))}
 
-      {!isAtBottom && <JumpToBottom onClick={jumpToBottom} />}
+              {status === "streaming" ||
+                (status === "submitted" && <ChatLoading />)}
+              {error && <ChatError error={error} />}
+              {messages.length === 0 && <ChatEmpty />}
 
-      <div className="flex-shrink-0 border-t bg-background">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <ChatInput
-            onSendMessage={handleSendMessageWithAutoScroll}
-            status={status}
-            error={error}
-            onStop={handleStop}
-            onRetry={handleGlobalRetryWithAutoScroll}
-          />
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+
+          {!isAtBottom && <JumpToBottom onClick={jumpToBottom} />}
+
+          <div className="flex-shrink-0 border-t bg-background">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <ChatInput
+                onSendMessage={handleSendMessageWithAutoScroll}
+                status={status}
+                error={error}
+                onStop={handleStop}
+                onRetry={handleGlobalRetryWithAutoScroll}
+              />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

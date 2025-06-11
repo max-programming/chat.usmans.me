@@ -1,4 +1,4 @@
-import { authMiddleware } from "@/auth-middleware";
+import { authUserMiddleware } from "@/auth-middleware";
 import { db } from "@/lib/db";
 import { messages } from "@/lib/db/schema";
 import { createServerFn } from "@tanstack/react-start";
@@ -16,7 +16,7 @@ export type NewMessageInput = z.infer<typeof newMessageSchema>;
 
 export const newMessage = createServerFn({ method: "POST" })
   .validator(newMessageSchema)
-  .middleware([authMiddleware])
+  .middleware([authUserMiddleware])
   .handler(
     async ({
       data: {

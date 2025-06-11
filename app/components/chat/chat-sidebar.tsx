@@ -13,13 +13,12 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import type { SidebarChat } from "@/server/chats/getChats";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { queries } from "@/lib/queries";
 
-interface ChatSidebarProps {
-  chats: SidebarChat[];
-}
-
-export function ChatSidebar({ chats }: ChatSidebarProps) {
+export function ChatSidebar() {
   const pathname = useLocation({ select: l => l.pathname });
+  const { data: chats } = useSuspenseQuery(queries.chats.all);
 
   return (
     <Sidebar>

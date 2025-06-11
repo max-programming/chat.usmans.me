@@ -25,20 +25,7 @@ export const Route = createFileRoute("/_protected/")({
 function ChatInterface() {
   return (
     <div className="h-screen flex flex-col max-h-screen overflow-hidden">
-      <div className="flex-shrink-0 flex justify-between items-center p-4 border-b bg-card">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="-ml-1" />
-          <h1 className="text-xl font-semibold text-foreground">
-            Chat Assistant
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <LogoutButton />
-        </div>
-      </div>
-      <div className="flex-1 min-h-0">
-        <ChatHome />
-      </div>
+      <ChatHome />
     </div>
   );
 }
