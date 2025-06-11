@@ -7,9 +7,9 @@ import { authMiddleware } from "@/auth-middleware";
 
 export type ChatWithMessages = Awaited<ReturnType<typeof getChatWithMessages>>;
 export const getChatWithMessages = createServerFn({ method: "GET" })
-  .validator(z.object({ chatId: z.string() }))
+  .validator(z.object({ chatId: z.string(), isNew: z.boolean().optional() }))
   .middleware([authMiddleware])
-  .handler(async ({ data: { chatId }, context }) => {
+  .handler(async ({ data: { chatId, isNew }, context }) => {
     const chat = await db
       .select({
         id: chats.id,
@@ -27,14 +27,18 @@ export const getChatWithMessages = createServerFn({ method: "GET" })
       .where(and(eq(chats.id, chatId), eq(chats.userId, context.user.id)))
       .innerJoin(messages, eq(chats.id, messages.chatId))
       .orderBy(asc(messages.createdAt));
+
     if (chat.length === 0) {
-      return {
-        chat: {
-          id: chatId,
-          title: "New Chat",
-        },
-        messages: [],
-      };
+      if (isNew) {
+        return {
+          chat: {
+            id: chatId,
+            title: "New Chat",
+          },
+          messages: [],
+        };
+      }
+      throw new Error("Chat not found");
     }
 
     return {

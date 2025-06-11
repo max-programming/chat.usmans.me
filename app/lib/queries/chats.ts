@@ -8,9 +8,9 @@ export const chats = createQueryKeys("chats", {
     queryKey: ["all"],
     queryFn: () => getChats(),
   },
-  withMessages: (chatId: string) => ({
-    queryKey: [chatId],
-    queryFn: () => getChatWithMessages({ data: { chatId } }),
+  withMessages: (chatId: string, isNew?: boolean) => ({
+    queryKey: [chatId, isNew],
+    queryFn: () => getChatWithMessages({ data: { chatId, isNew } }),
   }),
   getChatTitle: (chatId: string) => ({
     queryKey: ["title", chatId],

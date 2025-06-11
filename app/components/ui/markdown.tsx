@@ -1,7 +1,16 @@
 import { memo } from "react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { CodeHighlight } from "./code-highlight";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./table";
 
 interface MarkdownProps {
   content: string;
@@ -21,7 +30,19 @@ export const Markdown = memo<MarkdownProps>(({ content, className }) => {
         className
       )}
     >
-      <ReactMarkdown components={{ code: CodeHighlight }}>
+      <ReactMarkdown
+        components={{
+          code: CodeHighlight,
+          table: Table,
+          thead: TableHeader,
+          tbody: TableBody,
+          tr: TableRow,
+          th: TableHead,
+          td: TableCell,
+          a: props => <a {...props} className="text-primary underline" />,
+        }}
+        remarkPlugins={[remarkGfm]}
+      >
         {content}
       </ReactMarkdown>
     </div>

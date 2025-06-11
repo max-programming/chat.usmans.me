@@ -19,21 +19,23 @@ export const Route = createFileRoute("/_protected/chat/$chatId")({
   loader: ({ context, params, deps }) => {
     const { chatId } = params;
     const { isNew } = deps;
-    if (isNew) {
-      context.queryClient.setQueryData(
-        queries.chats.withMessages(chatId).queryKey,
-        {
-          chat: {
-            id: chatId,
-            title: "New Chat",
-          },
-          messages: [],
-        }
-      );
-      return;
-    }
+    // if (isNew) {
+    //   context.queryClient.setQueryData(
+    //     queries.chats.withMessages(chatId).queryKey,
+    //     {
+    //       chat: {
+    //         id: chatId,
+    //         title: "New Chat",
+    //       },
+    //       messages: [],
+    //     }
+    //   );
+    //   return;
+    // }
 
-    context.queryClient.ensureQueryData(queries.chats.withMessages(chatId));
+    context.queryClient.ensureQueryData(
+      queries.chats.withMessages(chatId, isNew)
+    );
   },
   head() {
     return {
