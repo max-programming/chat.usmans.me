@@ -18,6 +18,7 @@ export function createRouter() {
       scrollRestoration: true,
       context: { queryClient },
       defaultPreload: "intent",
+      defaultViewTransition: true,
     }),
     queryClient
   );
