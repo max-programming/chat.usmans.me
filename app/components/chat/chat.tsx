@@ -21,14 +21,14 @@ interface ChatProps {
 }
 
 export function Chat({ chatId }: ChatProps) {
-  const {
-    data: { chat, messages: initialMessages },
-  } = useSuspenseQuery(queries.chats.withMessages(chatId));
-
   const { initialMessage, isNew } = useStore(chatStore, s => ({
     initialMessage: s.initialMessage,
     isNew: s.isNew,
   }));
+
+  const {
+    data: { chat, messages: initialMessages },
+  } = useSuspenseQuery(queries.chats.withMessages(chatId, isNew));
 
   const { complete: generateTitle, completion: generatedTitle } =
     useGenerateTitle(chat.id);
