@@ -10,11 +10,10 @@ import { useChatMessages } from "@/hooks/use-chat-messages";
 import { useStore } from "@tanstack/react-store";
 import { chatStore } from "@/lib/stores/chat.store";
 import { useSingleEffect } from "@/hooks/use-single-effect";
-import { LogoutButton } from "../LogoutButton";
-import { SidebarTrigger } from "../ui/sidebar";
 import { useGenerateTitle } from "@/hooks/use-generate-title";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { queries } from "@/lib/queries";
+import { ChatHeader } from "./chat-header";
 
 interface ChatProps {
   chatId: string;
@@ -86,17 +85,7 @@ export function Chat({ chatId }: ChatProps) {
 
   return (
     <>
-      <div className="flex-shrink-0 flex justify-between items-center p-4 border-b bg-card">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="-ml-1" />
-          <h1 className="text-xl font-semibold text-foreground">
-            {isNew ? generatedTitle : chat.title}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <LogoutButton />
-        </div>
-      </div>
+      <ChatHeader title={isNew ? generatedTitle : chat.title} />
       <div className="flex-1 min-h-0">
         <div className="flex flex-col h-full bg-background relative">
           <div

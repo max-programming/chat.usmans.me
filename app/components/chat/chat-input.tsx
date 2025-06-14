@@ -76,7 +76,7 @@ export function ChatInput({
     models.find(m => m.id === selectedModel.model) ?? models[0];
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
+    <div className="w-full max-w-4xl mx-auto px-4">
       <div className="relative bg-card border border-border rounded-2xl shadow-lg transition-all duration-200 hover:shadow-xl focus-within:shadow-xl focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
         <form onSubmit={handleSubmit} className="flex items-end gap-2 p-4">
           <div className="flex-1 relative">
