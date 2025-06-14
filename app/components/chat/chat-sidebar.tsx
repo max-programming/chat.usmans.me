@@ -1,4 +1,4 @@
-import { MessageSquarePlus, MessageSquare } from "lucide-react";
+import { MessageSquarePlus, MessageSquare, Sparkles } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   Sidebar,
@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import type { SidebarChat } from "@/server/chats/getChats";
@@ -21,37 +22,74 @@ export function ChatSidebar() {
   const { data: chats } = useSuspenseQuery(queries.chats.all);
 
   return (
-    <Sidebar>
-      <SidebarHeader className="p-4">
+    <Sidebar className="border-r bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60">
+      <SidebarHeader className="p-4 pb-3">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 border border-primary/20">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-sidebar-foreground leading-tight">
+              Chat Assistant
+            </h2>
+            <p className="text-xs text-sidebar-foreground/60">Powered by AI</p>
+          </div>
+        </div>
         <Link to="/">
-          <Button className="w-full" size="sm">
-            <MessageSquarePlus className="h-4 w-4" />
-            New Chat
+          <Button
+            className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-lg font-medium"
+            size="default"
+          >
+            <MessageSquarePlus className="w-4 h-4" />
+            Start New Chat
           </Button>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="pb-4">
         <SidebarGroup>
-          <SidebarGroupLabel>Recent Chats</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-2 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider mb-2">
+            Recent Conversations
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {chats.map(chat => (
+            <SidebarMenu className="space-y-0.5">
+              {chats.map((chat, index) => (
                 <SidebarMenuItem key={chat.id}>
                   <SidebarMenuButton
                     isActive={pathname === `/chat/${chat.id}`}
                     asChild
+                    className="group relative rounded-lg h-10 px-2 transition-all duration-200 hover:bg-sidebar-accent/50 data-[active=true]:bg-sidebar-accent data-[active=true]:shadow-sm data-[active=true]:border-sidebar-accent-foreground/10 border border-transparent mx-1"
                   >
                     <Link to="/chat/$chatId" params={{ chatId: chat.id }}>
-                      <MessageSquare className="h-4 w-4" />
-                      <span className="truncate">{chat.title}</span>
+                      <div className="flex items-center gap-2.5 w-full min-w-0">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-md bg-sidebar-accent/20 group-hover:bg-sidebar-accent/30 transition-colors">
+                          <MessageSquare className="w-3.5 h-3.5 text-sidebar-accent-foreground/70" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-medium text-sidebar-foreground truncate block leading-tight">
+                            {chat.title}
+                          </span>
+                        </div>
+                      </div>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {chats.length === 0 && (
+                <div className="px-2 py-6 text-center">
+                  <MessageSquare className="w-7 h-7 text-sidebar-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-sidebar-foreground/60 mb-1">
+                    No conversations yet
+                  </p>
+                  <p className="text-xs text-sidebar-foreground/40">
+                    Start a new chat to get going
+                  </p>
+                </div>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarRail />
     </Sidebar>
   );
 }

@@ -19,13 +19,13 @@ export const Route = createFileRoute("/_protected")({
 
 function ProtectedLayout() {
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-background">
       <SidebarProvider>
         <Suspense fallback={<ChatSidebarSkeleton />}>
           <ChatSidebar />
         </Suspense>
-        <SidebarInset className="flex flex-col">
-          <main className="flex-1 min-h-0">
+        <SidebarInset className="flex flex-col bg-background">
+          <main className="flex-1 min-h-0 overflow-hidden">
             <Outlet />
           </main>
         </SidebarInset>
