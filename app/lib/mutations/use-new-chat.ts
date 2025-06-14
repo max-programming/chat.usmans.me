@@ -1,7 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { newChat, type NewChatInput } from "@/server/chats/newChat";
 import { queries } from "../queries";
-import type { SidebarChat } from "@/server/chats/getChats";
+import type { InfiniteChats } from "@/server/chats/getChats";
 
 export function useNewChat() {
   const queryClient = useQueryClient();
@@ -9,11 +13,25 @@ export function useNewChat() {
   return useMutation({
     mutationFn: (input: NewChatInput) => newChat({ data: input }),
     async onSuccess({ chatId, title }) {
-      // await queryClient.invalidateQueries(queries.chats.withMessages(chatId));
-      // await queryClient.invalidateQueries(queries.chats.all);
-      queryClient.setQueryData(
-        queries.chats.all.queryKey,
-        (old: SidebarChat[]) => [{ id: chatId, title }, ...old]
+      // Update the infinite query data
+      queryClient.setQueryData<InfiniteData<InfiniteChats>>(
+        queries.chats.infinite(20).queryKey,
+        old => {
+          if (!old || !old.pages || old.pages.length === 0) return old;
+
+          const newChat = { id: chatId, title, createdAt: new Date() };
+
+          return {
+            ...old,
+            pages: [
+              {
+                ...old.pages[0],
+                chats: [newChat, ...old.pages[0].chats],
+              },
+              ...old.pages.slice(1),
+            ],
+          };
+        }
       );
     },
   });

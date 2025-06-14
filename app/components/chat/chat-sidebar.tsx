@@ -13,13 +13,13 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import type { SidebarChat } from "@/server/chats/getChats";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { queries } from "@/lib/queries";
+import { useInfiniteChats } from "@/hooks/use-infinite-chats";
 
 export function ChatSidebar() {
   const pathname = useLocation({ select: l => l.pathname });
-  const { data: chats } = useSuspenseQuery(queries.chats.all);
+
+  const { allChats, hasNextPage, loadMoreRef, isLoadingMore } =
+    useInfiniteChats(20);
 
   return (
     <Sidebar className="border-r bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60">
@@ -52,7 +52,7 @@ export function ChatSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-0.5">
-              {chats.map((chat, index) => (
+              {allChats.map(chat => (
                 <SidebarMenuItem key={chat.id}>
                   <SidebarMenuButton
                     isActive={pathname === `/chat/${chat.id}`}
@@ -74,7 +74,26 @@ export function ChatSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {chats.length === 0 && (
+
+              {/* Infinite scroll trigger and loading indicator */}
+              {hasNextPage && (
+                <SidebarMenuItem>
+                  <div ref={loadMoreRef} className="flex justify-center py-2">
+                    {isLoadingMore ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-sidebar-foreground/30 border-t-sidebar-foreground rounded-full animate-spin" />
+                        <span className="text-xs text-sidebar-foreground/60">
+                          Loading more...
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4" /> // Invisible trigger element
+                    )}
+                  </div>
+                </SidebarMenuItem>
+              )}
+
+              {allChats.length === 0 && (
                 <div className="px-2 py-6 text-center">
                   <MessageSquare className="w-7 h-7 text-sidebar-foreground/30 mx-auto mb-2" />
                   <p className="text-sm text-sidebar-foreground/60 mb-1">

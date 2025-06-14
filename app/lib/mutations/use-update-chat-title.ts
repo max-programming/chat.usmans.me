@@ -1,9 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { queries } from "../queries";
 import { updateChatTitle } from "@/server/chats/updateChatTitle";
 import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
 import { resetChat } from "../stores/chat.store";
-import type { SidebarChat } from "@/server/chats/getChats";
+import type { InfiniteChats, SidebarChat } from "@/server/chats/getChats";
 
 export function useUpdateChatTitle() {
   const queryClient = useQueryClient();
@@ -19,22 +23,25 @@ export function useUpdateChatTitle() {
           chat: { ...old.chat, title },
         })
       );
-      queryClient.setQueryData(
-        queries.chats.all.queryKey,
-        (old: SidebarChat[]) =>
-          old.map(chat => (chat.id === chatId ? { ...chat, title } : chat))
+
+      queryClient.setQueryData<InfiniteData<InfiniteChats>>(
+        queries.chats.infinite(20).queryKey,
+        old => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => ({
+              ...page,
+              chats: page.chats.map((chat: SidebarChat) =>
+                chat.id === chatId ? { ...chat, title } : chat
+              ),
+            })),
+          };
+        }
       );
+
       resetChat();
-      // await queryClient.invalidateQueries(queries.chats.all);
-      // queryClient.setQueryData(
-      //   queries.chats.withMessages(chatId).queryKey,
-      //   (old: ChatWithMessages) => {
-      //     return {
-      //       ...old,
-      //       chat: { ...old.chat, title },
-      //     };
-      //   }
-      // );
     },
   });
 }

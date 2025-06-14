@@ -4,6 +4,7 @@ import { ChatSidebarSkeleton } from "@/components/chat/chat-sidebar-skeleton";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { queries } from "@/lib/queries";
 import { Suspense } from "react";
+import type { InfiniteChats } from "@/server/chats/getChats";
 
 export const Route = createFileRoute("/_protected")({
   beforeLoad({ context }) {
@@ -12,7 +13,11 @@ export const Route = createFileRoute("/_protected")({
     }
   },
   loader({ context }) {
-    context.queryClient.ensureQueryData(queries.chats.all);
+    context.queryClient.ensureInfiniteQueryData<InfiniteChats>({
+      ...queries.chats.infinite(20),
+      initialPageParam: undefined,
+      getNextPageParam: (lastPage: InfiniteChats) => lastPage.nextCursor,
+    });
   },
   component: ProtectedLayout,
 });
