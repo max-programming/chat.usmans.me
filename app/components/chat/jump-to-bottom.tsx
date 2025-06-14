@@ -1,13 +1,22 @@
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "@tanstack/react-router";
+import { cn } from "@/lib/utils";
 
 interface JumpToBottomProps {
   onClick: () => void;
 }
 
 export function JumpToBottom({ onClick }: JumpToBottomProps) {
+  const pathname = useLocation({ select: l => l.pathname });
+
   return (
-    <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 z-10">
+    <div
+      className={cn(
+        "absolute left-1/2 transform -translate-x-1/2 z-10",
+        pathname.startsWith("/share/") ? "bottom-12" : "bottom-40"
+      )}
+    >
       <Button
         onClick={onClick}
         className="flex items-center justify-center"

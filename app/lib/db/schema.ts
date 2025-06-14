@@ -13,6 +13,7 @@ import {
   customType,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import type { Message } from "ai";
 
 const authSchema = pgSchema("auth");
@@ -28,6 +29,8 @@ export const chats = pgTable(
     userId: uuid("user_id").default(sql`auth.uid()`),
     title: varchar().default("New Chat").notNull(),
     isArchived: boolean("is_archived").default(false),
+    isPublic: boolean("is_public").default(false),
+    shareId: varchar("share_id", { length: 10 }).unique(),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },

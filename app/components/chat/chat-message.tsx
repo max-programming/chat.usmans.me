@@ -24,7 +24,7 @@ export function ChatMessage({
 
   if (isUser) {
     return (
-      <div className="flex justify-end">
+      <div className="flex justify-end wrap-break-word">
         <div className="max-w-xs lg:max-w-md">
           <div className="rounded-lg p-3 bg-muted">
             <Markdown content={message.content} className="text-sm" />

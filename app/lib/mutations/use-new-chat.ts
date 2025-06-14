@@ -6,13 +6,14 @@ import {
 import { newChat, type NewChatInput } from "@/server/chats/newChat";
 import { queries } from "../queries";
 import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
+import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
 
 export function useNewChat() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (input: NewChatInput) => newChat({ data: input }),
-    async onSuccess({ chatId, title }) {
+    onSuccess({ chatId, title, shareId }) {
       // Update the infinite query data
       queryClient.setQueryData<InfiniteData<InfiniteChats>>(
         queries.chats.infinite(20).queryKey,
@@ -32,6 +33,13 @@ export function useNewChat() {
             ],
           };
         }
+      );
+      queryClient.setQueryData(
+        queries.chats.withMessages(chatId, true).queryKey,
+        (old: ChatWithMessages): ChatWithMessages => ({
+          ...old,
+          chat: { ...old.chat, title, shareId, isPublic: false },
+        })
       );
     },
   });

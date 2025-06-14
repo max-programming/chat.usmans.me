@@ -5,12 +5,12 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import appCss from "@/styles/app.css?url";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { fetchUser } from "@/server/fetchUser";
+import appCss from "@/styles/app.css?url";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -28,12 +28,7 @@ export const Route = createRootRouteWithContext<{
         title: "Chat Assistant",
       },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   async beforeLoad({ context }) {
     const user = await context.queryClient.fetchQuery({
@@ -42,14 +37,16 @@ export const Route = createRootRouteWithContext<{
     });
     return { user };
   },
-  errorComponent: props => {
-    return (
-      <RootDocument>
-        <DefaultCatchBoundary {...props} />
-      </RootDocument>
-    );
-  },
-  notFoundComponent: () => <NotFound />,
+  errorComponent: props => (
+    <RootDocument>
+      <DefaultCatchBoundary {...props} />
+    </RootDocument>
+  ),
+  notFoundComponent: () => (
+    <RootDocument>
+      <NotFound />
+    </RootDocument>
+  ),
   component: RootComponent,
 });
 
@@ -57,6 +54,8 @@ function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
+      <Scripts />
+      <ReactQueryDevtools initialIsOpen={false} />
     </RootDocument>
   );
 }
@@ -67,11 +66,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <body className="dark">
-        {children}
-        <Scripts />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </body>
+      <body className="dark">{children}</body>
     </html>
   );
 }

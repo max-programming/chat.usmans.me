@@ -106,7 +106,9 @@ export function useChatMessages({
       const messageId = generateMessageId();
       const promises = [];
       if (isNew) {
-        promises.push(newChat({ chatId: id, message: content }));
+        promises.push(
+          newChat({ chatId: id, message: content, timestamp: new Date() })
+        );
       } else {
         promises.push(
           newMessage({

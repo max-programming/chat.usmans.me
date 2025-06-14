@@ -1,12 +1,14 @@
 import { LogoutButton } from "../LogoutButton";
 import { SidebarTrigger } from "../ui/sidebar";
 import { MessageCircle } from "lucide-react";
+import { ShareButton } from "../ShareButton";
 
 interface ChatHeaderProps {
   title: string;
+  chatId?: string;
 }
 
-export function ChatHeader({ title }: ChatHeaderProps) {
+export function ChatHeader({ title, chatId }: ChatHeaderProps) {
   return (
     <div className="flex-shrink-0 flex justify-between items-center p-4 pb-3 border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/30 border-border/50">
       <div className="flex items-center gap-3">
@@ -25,6 +27,7 @@ export function ChatHeader({ title }: ChatHeaderProps) {
       </div>
       <div className="flex items-center gap-2">
         <LogoutButton />
+        {chatId && <ShareButton chatId={chatId} />}
       </div>
     </div>
   );
