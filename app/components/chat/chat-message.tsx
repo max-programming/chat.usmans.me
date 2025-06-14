@@ -1,11 +1,11 @@
 import { Copy, RotateCcw } from "lucide-react";
-import type { Message } from "ai";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Button } from "../ui/button";
 import { Markdown } from "../ui/markdown";
+import type { ExtendedMessage } from "@/hooks/use-chat-messages";
 
 interface ChatMessageProps {
-  message: Message & { processedContent?: string };
+  message: ExtendedMessage;
   onRetry?(messageId: string): void;
   canRetry?: boolean;
 }
@@ -74,7 +74,7 @@ export function ChatMessage({
         </p>
       </div>
 
-      <div className="flex mt-2 gap-1 justify-start">
+      <div className="flex mt-2 gap-1 justify-start items-center">
         <Button
           onClick={handleCopyToClipboard}
           variant="ghost"
@@ -94,6 +94,10 @@ export function ChatMessage({
             <RotateCcw className="w-3 h-3" />
           </Button>
         )}
+
+        <span className="text-xs text-muted-foreground">
+          {message.modelName}
+        </span>
       </div>
     </div>
   );

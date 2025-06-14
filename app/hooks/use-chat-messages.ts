@@ -1,3 +1,4 @@
+import { models } from "@/lib/models";
 import { useNewChat } from "@/lib/mutations/use-new-chat";
 import { useNewMessage } from "@/lib/mutations/use-new-message";
 import { useUpdateChatTitle } from "@/lib/mutations/use-update-chat-title";
@@ -5,10 +6,19 @@ import { chatStore, startNewChat } from "@/lib/stores/chat.store";
 import { useChat, type Message } from "@ai-sdk/react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useStore } from "@tanstack/react-store";
+import { useReadLocalStorage } from "usehooks-ts";
+import type { AllowedModels, AllowedProviders } from "@/routes/api/chat";
+import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
+import { generateMessageId } from "@/server/messages/newMessage";
 
 interface UseChatMessagesProps {
-  initialMessages?: Message[];
+  initialMessages?: ChatWithMessages["messages"];
   chatId?: string;
+}
+
+export interface ModelConfig {
+  provider: AllowedProviders;
+  model: AllowedModels;
 }
 
 export function useChatMessages({
@@ -24,18 +34,35 @@ export function useChatMessages({
   const { mutate: newChat } = useNewChat();
   const { mutate: updateChatTitle } = useUpdateChatTitle();
 
+  const selectedModel = useReadLocalStorage<ModelConfig>("model-config");
+
   const { messages, append, status, error, reload, stop, setMessages, id } =
     useChat({
       initialMessages,
       id: chatId,
+      body: selectedModel
+        ? {
+            provider: selectedModel.provider,
+            model: selectedModel.model,
+          }
+        : undefined,
       onFinish(message, options) {
-        newMessage({
-          chatId: id,
-          content: message.content,
-          role: message.role,
-          tokenCount: options.usage.completionTokens,
-          messageId: message.id,
-        });
+        console.log(options);
+        if (options.finishReason === "stop") {
+          const modelName = models.find(
+            m => m.id === selectedModel?.model
+          )?.name;
+          newMessage({
+            chatId: id,
+            content: message.content,
+            role: message.role,
+            tokenCount: options.usage.completionTokens,
+            messageId: message.id,
+            modelName,
+          });
+        } else {
+          console.log(options);
+        }
       },
       onResponse: response => {
         console.log("Chat API Response:", response.status, response.statusText);
@@ -54,6 +81,16 @@ export function useChatMessages({
   function handleStop() {
     if (status === "streaming") {
       stop();
+      const lastMessage = messages[messages.length - 1];
+      const modelName = models.find(m => m.id === selectedModel?.model)?.name;
+      newMessage({
+        chatId: id,
+        content: lastMessage.content,
+        role: lastMessage.role,
+        tokenCount: 0, // TODO: get token count somehow
+        messageId: lastMessage.id,
+        modelName,
+      });
     }
   }
 
@@ -66,6 +103,7 @@ export function useChatMessages({
         search: { isNew: true },
       });
     } else {
+      const messageId = generateMessageId();
       const promises = [];
       if (isNew) {
         promises.push(newChat({ chatId: id, message: content }));
@@ -75,11 +113,13 @@ export function useChatMessages({
             chatId: id,
             content,
             role: "user",
+            messageId,
           })
         );
       }
       promises.push(
         append({
+          id: messageId,
           role: "user",
           content,
         })
@@ -88,32 +128,38 @@ export function useChatMessages({
     }
   }
 
-  function handleMessageRetry(messageId: string) {
+  async function handleMessageRetry(messageId: string) {
     const messageIndex = messages.findIndex(msg => msg.id === messageId);
     if (messageIndex === -1) return;
 
     const messageToRetry = messages[messageIndex];
+    const truncatedMessages = messages.slice(0, messageIndex);
 
-    if (messageToRetry.role === "assistant") {
-      const truncatedMessages = messages.slice(0, messageIndex);
+    try {
       setMessages(truncatedMessages);
 
-      if (truncatedMessages.length > 0) {
-        const lastMessage = truncatedMessages[truncatedMessages.length - 1];
-        if (lastMessage.role === "user") {
-          setTimeout(() => {
-            reload();
-          }, 0);
-        }
+      if (messageToRetry.role === "assistant") {
+        await new Promise(resolve => setTimeout(resolve, 0));
+        reload();
+      } else if (messageToRetry.role === "user") {
+        await handleSendMessage(messageToRetry.content);
       }
-    } else {
-      const truncatedMessages = messages.slice(0, messageIndex);
-      setMessages(truncatedMessages);
+    } catch (error) {
+      console.error("Retry failed:", error);
     }
   }
 
+  const extendedMessages = messages.map<ExtendedMessage>(message => {
+    if (message.role === "user") return message as ExtendedMessage;
+    const iMessage = initialMessages.find(m => m.id === message.id);
+    return {
+      ...message,
+      modelName: iMessage?.modelName,
+    };
+  });
+
   return {
-    messages,
+    messages: extendedMessages,
     status,
     error,
     handleSendMessage,
@@ -121,4 +167,8 @@ export function useChatMessages({
     handleGlobalRetry,
     handleStop,
   };
+}
+
+export interface ExtendedMessage extends Message {
+  modelName: string | null | undefined;
 }
