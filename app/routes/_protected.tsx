@@ -4,7 +4,7 @@ import { ChatSidebarSkeleton } from "@/components/chat/chat-sidebar-skeleton";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { queries } from "@/lib/queries";
 import { Suspense } from "react";
-import type { InfiniteChats } from "@/server/chats/getChats";
+import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
 
 export const Route = createFileRoute("/_protected")({
   beforeLoad({ context }) {

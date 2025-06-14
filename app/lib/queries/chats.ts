@@ -1,4 +1,4 @@
-import { getChatsInfinite } from "@/server/chats/getChats";
+import { getChatsInfinite } from "@/server/chats/getChatsInfinite";
 import { getChatTitle } from "@/server/chats/getChatTitle";
 import { getChatWithMessages } from "@/server/chats/getChatWithMessages";
 import { createQueryKeys } from "@lukemorales/query-key-factory";

@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { newChat, type NewChatInput } from "@/server/chats/newChat";
 import { queries } from "../queries";
-import type { InfiniteChats } from "@/server/chats/getChats";
+import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
 
 export function useNewChat() {
   const queryClient = useQueryClient();

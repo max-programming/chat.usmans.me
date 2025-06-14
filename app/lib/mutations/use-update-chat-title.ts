@@ -7,7 +7,10 @@ import { queries } from "../queries";
 import { updateChatTitle } from "@/server/chats/updateChatTitle";
 import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
 import { resetChat } from "../stores/chat.store";
-import type { InfiniteChats, SidebarChat } from "@/server/chats/getChats";
+import type {
+  InfiniteChats,
+  SidebarChat,
+} from "@/server/chats/getChatsInfinite";
 
 export function useUpdateChatTitle() {
   const queryClient = useQueryClient();

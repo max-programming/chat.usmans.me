@@ -2,7 +2,7 @@ import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import { queries } from "@/lib/queries";
-import type { InfiniteChats } from "@/server/chats/getChats";
+import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
 
 export function useInfiniteChats(limit: number = 20) {
   const { ref, inView } = useInView();
