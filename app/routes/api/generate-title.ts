@@ -1,3 +1,4 @@
+import { getSession } from "@/server/getSession";
 import { openai } from "@ai-sdk/openai";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { streamText } from "ai";
@@ -9,6 +10,10 @@ const generateTitleSchema = z.object({
 
 export const APIRoute = createAPIFileRoute("/api/generate-title")({
   POST: async ({ request }) => {
+    const session = await getSession();
+    if (!session) {
+      throw new Error("User not found");
+    }
     const { prompt } = generateTitleSchema.parse(await request.json());
     const result = streamText({
       model: openai("gpt-4o-mini"),
