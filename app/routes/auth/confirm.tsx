@@ -9,8 +9,7 @@ const confirmFn = createServerFn({ method: "GET" })
     if (
       searchParams &&
       typeof searchParams === "object" &&
-      "code" in searchParams &&
-      "next" in searchParams
+      "code" in searchParams
     ) {
       return searchParams;
     }
@@ -25,8 +24,6 @@ const confirmFn = createServerFn({ method: "GET" })
 
     const searchParams = ctx.data;
     const code = searchParams["code"] as string;
-    const _next = (searchParams["next"] ?? "/") as string;
-    const next = _next?.startsWith("/") ? _next : "/";
 
     if (code) {
       const supabase = createClient();
@@ -35,7 +32,7 @@ const confirmFn = createServerFn({ method: "GET" })
       console.log(error?.message);
       if (!error) {
         // redirect user to specified redirect URL or root of app
-        throw redirect({ href: next });
+        throw redirect({ href: "/" });
       } else {
         // redirect the user to an error page with some instructions
         throw redirect({

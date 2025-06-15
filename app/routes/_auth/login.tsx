@@ -35,10 +35,14 @@ function RouteComponent() {
       setError(null);
 
       const baseUrl = import.meta.env.VITE_URL;
+      console.log("baseUrl", baseUrl);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${baseUrl}/auth/confirm?next=/`,
+          redirectTo: `${baseUrl}/auth/confirm`,
+          queryParams: {
+            next: "/",
+          },
         },
       });
 
