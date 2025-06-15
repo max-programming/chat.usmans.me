@@ -76,18 +76,21 @@ export function ChatInput({
     models.find(m => m.id === selectedModel.model) ?? models[0];
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
+    <div className="w-full max-w-4xl mx-auto">
       <div className="relative bg-card border border-border rounded-2xl shadow-lg transition-all duration-200 hover:shadow-xl focus-within:shadow-xl focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-4">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-2 p-3 sm:p-4"
+        >
           <div className="flex items-end gap-2">
             <div className="flex-1 relative min-w-0">
               <Textarea
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask me anything... (Press Enter to send, Shift+Enter for new line)"
+                placeholder="Ask me anything..."
                 disabled={disabled}
-                className="min-h-[60px] max-h-[160px] resize-none border-0 !bg-card focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none text-base leading-relaxed p-0 placeholder:text-muted-foreground shadow-none break-words"
+                className="min-h-[56px] sm:min-h-[60px] max-h-[140px] sm:max-h-[160px] resize-none border-0 !bg-card focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none text-base leading-relaxed p-0 placeholder:text-muted-foreground shadow-none break-words"
                 rows={1}
                 ref={textareaRef}
                 autoFocus
@@ -109,17 +112,19 @@ export function ChatInput({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-10 px-3 rounded-full border border-border hover:bg-muted/50 transition-colors"
+                    className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full border border-border hover:bg-muted/50 transition-colors"
                   >
                     <currentModel.icon
                       className="h-4 w-4"
                       color={currentModel.color}
                     />
-                    <span className="text-sm">{currentModel.name}</span>
+                    <span className="text-sm hidden sm:inline">
+                      {currentModel.name}
+                    </span>
                     <ChevronDown className="h-3 w-3 ml-1 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuContent align="end" className="w-56 sm:w-64">
                   <DropdownMenuLabel>Select AI Model</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {models.map(model => (
@@ -131,14 +136,14 @@ export function ChatInput({
                           provider: model.provider,
                         })
                       }
-                      className="flex items-center gap-3 p-3 cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 cursor-pointer"
                     >
                       <model.icon
                         className="h-4 w-4 flex-shrink-0"
                         color={model.color}
                       />
                       <div className="flex-1 text-left">
-                        <div className="font-medium">{model.name}</div>
+                        <div className="font-medium text-sm">{model.name}</div>
                         <div className="text-xs text-muted-foreground">
                           {model.providerDisplayName}
                         </div>
@@ -158,7 +163,7 @@ export function ChatInput({
                   onClick={onRetry}
                   size="sm"
                   variant="ghost"
-                  className="h-10 w-10 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
                   title="Retry last message"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -171,7 +176,7 @@ export function ChatInput({
                   type="button"
                   onClick={onStop}
                   size="sm"
-                  className="h-10 w-10 rounded-full bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-md transition-all duration-200 hover:shadow-lg active:scale-95"
+                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-md transition-all duration-200 hover:shadow-lg active:scale-95"
                   title="Stop generating"
                 >
                   <Square className="h-4 w-4" />
@@ -182,7 +187,7 @@ export function ChatInput({
                   type="submit"
                   disabled={!canSendMessage}
                   size="sm"
-                  className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground shadow-md transition-all duration-200 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground shadow-md transition-all duration-200 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:shadow-none"
                   title={
                     canSendMessage ? "Send message" : "Type a message to send"
                   }
@@ -196,14 +201,14 @@ export function ChatInput({
 
         {/* Status indicator */}
         {status === "submitted" && (
-          <div className="absolute bottom-2 left-4 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="absolute bottom-3 left-3 sm:left-4 flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
             Sending...
           </div>
         )}
 
         {isStreaming && (
-          <div className="absolute bottom-2 left-4 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="absolute bottom-3 left-3 sm:left-4 flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
             <div className="flex gap-1">
               <div
                 className="w-1 h-1 bg-primary rounded-full animate-bounce"
@@ -223,15 +228,15 @@ export function ChatInput({
         )}
 
         {hasError && (
-          <div className="absolute bottom-2 left-4 flex items-center gap-2 text-sm text-destructive">
+          <div className="absolute bottom-3 left-3 sm:left-4 flex items-center gap-2 text-xs sm:text-sm text-destructive">
             <div className="w-2 h-2 bg-destructive rounded-full"></div>
             Failed to send message
           </div>
         )}
       </div>
 
-      {/* Helpful shortcuts */}
-      <div className="flex justify-center mt-3 text-xs text-muted-foreground">
+      {/* Helpful shortcuts - hidden on mobile */}
+      <div className="hidden sm:flex justify-center mt-3 text-xs text-muted-foreground">
         <span>
           Press{" "}
           <kbd className="px-1.5 py-0.5 bg-muted text-muted-foreground rounded">

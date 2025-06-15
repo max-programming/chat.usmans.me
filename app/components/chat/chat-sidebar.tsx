@@ -17,12 +17,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useInfiniteChats } from "@/hooks/use-infinite-chats";
 import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog";
 
 export function ChatSidebar() {
+  const { isMobile, toggleSidebar } = useSidebar();
   const pathname = useLocation({ select: l => l.pathname });
 
   const { allChats, hasNextPage, loadMoreRef, isLoadingMore } =
@@ -42,7 +44,7 @@ export function ChatSidebar() {
             <p className="text-xs text-sidebar-foreground/60">Powered by AI</p>
           </div>
         </div>
-        <Link to="/">
+        <Link to="/" onClick={() => isMobile && toggleSidebar()}>
           <Button
             className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-lg font-medium"
             size="default"

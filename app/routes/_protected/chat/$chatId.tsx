@@ -52,7 +52,7 @@ function ChatInterface() {
   const { chatId } = Route.useParams();
 
   return (
-    <div className="h-screen flex flex-col max-h-screen overflow-hidden">
+    <div className="h-screen w-full flex flex-col max-h-screen overflow-hidden">
       <Suspense fallback={<ChatSkeleton />}>
         <Chat chatId={chatId} />
       </Suspense>

@@ -33,7 +33,7 @@ function SharedChatInterface() {
   const { shareId } = Route.useParams();
 
   return (
-    <div className="h-screen flex flex-col max-h-screen overflow-hidden">
+    <div className="h-screen w-full flex flex-col max-h-screen overflow-hidden">
       <Suspense fallback={<SharedChatSkeleton />}>
         <SharedChat shareId={shareId} />
       </Suspense>

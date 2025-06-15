@@ -96,7 +96,7 @@ export function Chat({ chatId }: ChatProps) {
             className="flex-1 overflow-y-auto min-h-0"
             onScroll={handleScroll}
           >
-            <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
+            <div className="max-w-4xl mx-auto px-3 py-3 space-y-4 sm:px-4 sm:py-4">
               {messages.map((message, index) => (
                 <ChatMessage
                   key={message.id}
@@ -118,7 +118,7 @@ export function Chat({ chatId }: ChatProps) {
           {!isAtBottom && <JumpToBottom onClick={jumpToBottom} />}
 
           <div className="flex-shrink-0 border-t bg-background">
-            <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className="max-w-4xl mx-auto px-3 py-3 sm:px-4 sm:py-4">
               <ChatInput
                 onSendMessage={handleSendMessageWithAutoScroll}
                 status={status}
