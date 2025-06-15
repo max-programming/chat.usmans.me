@@ -33,7 +33,6 @@ export const Route = createRootRouteWithContext<{
   }),
   async beforeLoad({ context }) {
     const user = await fetchUser();
-    console.log("user", user);
     return { user };
   },
   errorComponent: props => (
