@@ -1,7 +1,6 @@
 import { models } from "@/lib/models";
 import { useNewChat } from "@/lib/mutations/use-new-chat";
 import { useNewMessage } from "@/lib/mutations/use-new-message";
-import { useUpdateChatTitle } from "@/lib/mutations/use-update-chat-title";
 import { chatStore, startNewChat } from "@/lib/stores/chat.store";
 import { useChat, type Message } from "@ai-sdk/react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
@@ -30,9 +29,8 @@ export function useChatMessages({
   const pathname = useLocation({ select: l => l.pathname });
   const navigate = useNavigate();
 
-  const { mutate: newMessage } = useNewMessage();
+  const { mutateAsync: newMessage } = useNewMessage();
   const { mutate: newChat } = useNewChat();
-  const { mutate: updateChatTitle } = useUpdateChatTitle();
 
   const selectedModel = useReadLocalStorage<ModelConfig>("model-config");
 
@@ -97,36 +95,29 @@ export function useChatMessages({
   async function handleSendMessage(content: string) {
     if (pathname === "/") {
       const newChatId = startNewChat(content);
+      const newMessageId = generateMessageId();
+      newChat({
+        chatId: newChatId,
+        message: content,
+        messageId: newMessageId,
+        timestamp: new Date(),
+      });
       navigate({
         to: "/chat/$chatId",
         params: { chatId: newChatId },
         search: { isNew: true },
       });
     } else {
-      const messageId = generateMessageId();
-      const promises = [];
       if (isNew) {
-        promises.push(
-          newChat({ chatId: id, message: content, timestamp: new Date() })
-        );
+        // start new chat with initial message
+        reload();
       } else {
-        promises.push(
-          newMessage({
-            chatId: id,
-            content,
-            role: "user",
-            messageId,
-          })
-        );
+        const messageId = generateMessageId();
+        await Promise.all([
+          append({ id: messageId, role: "user", content }),
+          newMessage({ chatId: id, content, role: "user", messageId }),
+        ]);
       }
-      promises.push(
-        append({
-          id: messageId,
-          role: "user",
-          content,
-        })
-      );
-      await Promise.all(promises);
     }
   }
 

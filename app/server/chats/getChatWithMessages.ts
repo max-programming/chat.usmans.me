@@ -31,17 +31,17 @@ export const getChatWithMessages = createServerFn({ method: "GET" })
       .orderBy(asc(messages.createdAt));
 
     if (chat.length === 0) {
-      if (isNew) {
-        return {
-          chat: {
-            id: chatId,
-            title: "New Chat",
-            isPublic: false,
-            shareId: null,
-          },
-          messages: [],
-        };
-      }
+      // if (isNew) {
+      //   return {
+      //     chat: {
+      //       id: chatId,
+      //       title: "New Chat",
+      //       isPublic: false,
+      //       shareId: null,
+      //     },
+      //     messages: [],
+      //   };
+      // }
       throw new Error("Chat not found");
     }
 
