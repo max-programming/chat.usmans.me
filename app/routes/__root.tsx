@@ -11,6 +11,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { fetchUser } from "@/server/fetchUser";
 import appCss from "@/styles/app.css?url";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -53,6 +54,7 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
+      <Toaster richColors closeButton />
       <Outlet />
       <Scripts />
       <ReactQueryDevtools initialIsOpen={false} />

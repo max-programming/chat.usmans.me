@@ -7,6 +7,7 @@ import { newChat, type NewChatInput } from "@/server/chats/newChat";
 import { queries } from "../queries";
 import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
 import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
+import { toast } from "sonner";
 
 export function useNewChat() {
   const queryClient = useQueryClient();
@@ -63,6 +64,7 @@ export function useNewChat() {
     },
     onError(error, variables) {
       console.error("Error adding chat", error);
+      toast.error("Failed to start chat");
       queryClient.setQueryData(
         queries.chats.withMessages(variables.chatId, true).queryKey,
         (old: ChatWithMessages) => ({ ...old, messages: [] })

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { newMessage, type NewMessageInput } from "@/server/messages/newMessage";
 import { queries } from "../queries";
 import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
+import { toast } from "sonner";
 
 export function useNewMessage() {
   const queryClient = useQueryClient();
@@ -27,6 +28,7 @@ export function useNewMessage() {
     },
     onError(error, variables) {
       console.error("Error adding message", error);
+      toast.error("Failed to send message");
       queryClient.setQueryData(
         queries.chats.withMessages(variables.chatId).queryKey,
         (old: ChatWithMessages) => ({

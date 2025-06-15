@@ -1,4 +1,9 @@
-import { MessageSquarePlus, MessageSquare, Sparkles } from "lucide-react";
+import {
+  MessageSquarePlus,
+  MessageSquare,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   Sidebar,
@@ -8,12 +13,14 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useInfiniteChats } from "@/hooks/use-infinite-chats";
+import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog";
 
 export function ChatSidebar() {
   const pathname = useLocation({ select: l => l.pathname });
@@ -72,6 +79,14 @@ export function ChatSidebar() {
                       </div>
                     </Link>
                   </SidebarMenuButton>
+                  <DeleteChatDialog chatId={chat.id} chatTitle={chat.title}>
+                    <SidebarMenuAction
+                      showOnHover
+                      className="hover:bg-destructive/10 hover:text-destructive transition-colors h-7 px-2"
+                    >
+                      <Trash2 />
+                    </SidebarMenuAction>
+                  </DeleteChatDialog>
                 </SidebarMenuItem>
               ))}
 
