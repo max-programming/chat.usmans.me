@@ -34,10 +34,11 @@ function RouteComponent() {
       setIsGoogleLoading(true);
       setError(null);
 
+      const baseUrl = import.meta.env.VITE_URL;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/confirm?next=/`,
+          redirectTo: `${baseUrl}/auth/confirm?next=/`,
         },
       });
 
