@@ -19,23 +19,24 @@ export const newChat = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .handler(
     async ({ data: { chatId, message, messageId, timestamp }, context }) => {
-      const shareId = nanoid(10);
-      const defaultTitle = "New Chat";
-      await db.insert(chats).values({
-        id: chatId,
-        title: defaultTitle,
-        userId: context.user.id,
-        shareId,
-        createdAt: timestamp ?? new Date(),
-      });
+      await db.transaction(async tx => {
+        const shareId = nanoid(10);
+        const defaultTitle = "New Chat";
 
-      await db.insert(messages).values({
-        id: messageId,
-        chatId,
-        content: message,
-        role: "user",
-      });
+        await tx.insert(chats).values({
+          id: chatId,
+          title: defaultTitle,
+          userId: context.user.id,
+          shareId,
+          createdAt: timestamp ?? new Date(),
+        });
 
-      return { chatId, messageId, title: defaultTitle, shareId };
+        await tx.insert(messages).values({
+          id: messageId,
+          chatId,
+          content: message,
+          role: "user",
+        });
+      });
     }
   );

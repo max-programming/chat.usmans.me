@@ -7,21 +7,31 @@ export function useNewMessage() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: NewMessageInput) => newMessage({ data: input }),
-    onSuccess(data, variables) {
-      const messageId = data.messageId;
-      const newMessage = {
-        id: messageId,
-        role: variables.role,
-        content: variables.content,
-        modelName: variables.modelName,
-        tokenCount: variables.tokenCount,
-      };
-
+    onMutate(input) {
+      queryClient.setQueryData(
+        queries.chats.withMessages(input.chatId).queryKey,
+        (old: ChatWithMessages) => {
+          const newMessage = {
+            id: input.messageId,
+            role: input.role,
+            content: input.content,
+            modelName: input.modelName,
+            tokenCount: input.tokenCount,
+          };
+          return {
+            ...old,
+            messages: [...old.messages, newMessage],
+          };
+        }
+      );
+    },
+    onError(error, variables) {
+      console.error("Error adding message", error);
       queryClient.setQueryData(
         queries.chats.withMessages(variables.chatId).queryKey,
         (old: ChatWithMessages) => ({
           ...old,
-          messages: [...old.messages, newMessage],
+          messages: old.messages.filter(msg => msg.id !== variables.messageId),
         })
       );
     },
