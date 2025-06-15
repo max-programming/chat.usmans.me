@@ -1,5 +1,4 @@
 import { ratelimit } from "@/lib/ratelimiter";
-import { getSession } from "@/server/getSession";
 import { openai } from "@ai-sdk/openai";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { streamText } from "ai";
@@ -18,10 +17,6 @@ export const APIRoute = createAPIFileRoute("/api/generate-title")({
     const { success } = await ratelimit.limit(ip);
     if (!success) {
       throw new Error("Rate limit exceeded");
-    }
-    const session = await getSession();
-    if (!session) {
-      throw new Error("User not found");
     }
     const { prompt } = generateTitleSchema.parse(await request.json());
     const result = streamText({
