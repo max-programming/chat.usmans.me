@@ -117,3 +117,5 @@ export const messages = pgTable(
     }),
   ]
 );
+
+export type MessageSelect = typeof messages.$inferSelect;
