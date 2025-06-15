@@ -19,16 +19,62 @@ export const newMessage = createServerFn({ method: "POST" })
   .validator(newMessageSchema)
   .middleware([authMiddleware])
   .handler(async ({ data }) => {
-    await db.insert(messages).values({
-      id: data.messageId,
-      chatId: data.chatId,
-      tokenCount: data.tokenCount,
-      content: data.content,
-      role: data.role,
-      modelName: data.modelName,
-    });
+    const maxRetries = 12; // Up to ~30 seconds total wait time
+    const baseDelay = 250; // Start with 250ms
 
-    return { chatId: data.chatId, messageId: data.messageId };
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await db.insert(messages).values({
+          id: data.messageId,
+          chatId: data.chatId,
+          tokenCount: data.tokenCount,
+          content: data.content,
+          role: data.role,
+          modelName: data.modelName,
+        });
+
+        // Success - log if we had to retry
+        if (attempt > 1) {
+          console.log(
+            `Message inserted successfully on attempt ${attempt}/${maxRetries}`
+          );
+        }
+
+        return { chatId: data.chatId, messageId: data.messageId };
+      } catch (error: any) {
+        // Check if it's a foreign key constraint error (chat doesn't exist yet)
+        const isForeignKeyError =
+          error?.code === "23503" || // PostgreSQL foreign key violation
+          error?.constraint_name === "messages_chat_id_fkey" ||
+          error?.message?.includes("foreign key") ||
+          error?.message?.includes("violates foreign key constraint") ||
+          error?.message?.includes("messages_chat_id_fkey");
+
+        if (isForeignKeyError && attempt < maxRetries) {
+          // Exponential backoff with jitter for cold start scenarios
+          const exponentialDelay = baseDelay * Math.pow(1.8, attempt - 1);
+          const jitter = Math.random() * 200; // Add some randomness
+          const totalDelay = Math.min(exponentialDelay + jitter, 5000); // Cap at 5 seconds
+
+          console.log(
+            `Chat not ready yet (attempt ${attempt}/${maxRetries}), retrying in ${Math.round(totalDelay)}ms...`
+          );
+          await new Promise(resolve => setTimeout(resolve, totalDelay));
+          continue;
+        }
+
+        // Either not a FK error, or we've exceeded max retries
+        console.error(
+          `Failed to insert message after ${attempt} attempts:`,
+          error
+        );
+        throw error;
+      }
+    }
+
+    throw new Error(
+      `Failed to insert message after ${maxRetries} attempts - chat may not exist`
+    );
   });
 
 export const generateMessageId = createIdGenerator({
