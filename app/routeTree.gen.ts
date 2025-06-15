@@ -18,7 +18,7 @@ import { Route as ShareShareIdImport } from './routes/share.$shareId'
 import { Route as AuthErrorImport } from './routes/auth/error'
 import { Route as AuthConfirmImport } from './routes/auth/confirm'
 import { Route as AuthLoginImport } from './routes/_auth/login'
-import { Route as ProtectedChatChatIdImport } from './routes/_protected/chat/$chatId'
+import { Route as ProtectedChatChatIdImport } from './routes/_protected/chat.$chatId'
 
 // Create/Update Routes
 
@@ -285,7 +285,7 @@ export const routeTree = rootRoute
       "parent": "/_protected"
     },
     "/_protected/chat/$chatId": {
-      "filePath": "_protected/chat/$chatId.tsx",
+      "filePath": "_protected/chat.$chatId.tsx",
       "parent": "/_protected"
     }
   }
