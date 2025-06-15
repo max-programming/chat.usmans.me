@@ -64,11 +64,11 @@ export function ChatSidebar() {
                   <SidebarMenuButton
                     isActive={pathname === `/chat/${chat.id}`}
                     asChild
-                    className="group relative rounded-lg h-10 px-2 transition-all duration-200 hover:bg-sidebar-accent/50 data-[active=true]:bg-sidebar-accent data-[active=true]:shadow-sm data-[active=true]:border-sidebar-accent-foreground/10 border border-transparent mx-1"
+                    className="relative rounded-lg h-10 px-2 transition-all duration-200 hover:bg-sidebar-accent/50 data-[active=true]:bg-sidebar-accent data-[active=true]:shadow-sm data-[active=true]:border-sidebar-accent-foreground/10 border border-transparent mx-1"
                   >
                     <Link to="/chat/$chatId" params={{ chatId: chat.id }}>
                       <div className="flex items-center gap-2.5 w-full min-w-0">
-                        <div className="flex items-center justify-center w-6 h-6 rounded-md bg-sidebar-accent/20 group-hover:bg-sidebar-accent/30 transition-colors">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-md bg-sidebar-accent/20 transition-colors">
                           <MessageSquare className="w-3.5 h-3.5 text-sidebar-accent-foreground/70" />
                         </div>
                         <div className="flex-1 min-w-0">

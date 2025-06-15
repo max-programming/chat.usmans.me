@@ -33,7 +33,7 @@ export function CodeHighlight({
       </div>
       <ShikiHighlighter
         language={language}
-        theme="catppuccin-mocha"
+        theme="vesper"
         delay={150}
         // showLineNumbers
         showLanguage={false}
