@@ -38,12 +38,10 @@ export function useChatMessages({
     useChat({
       initialMessages,
       id: chatId,
-      body: selectedModel
-        ? {
-            provider: selectedModel.provider,
-            model: selectedModel.model,
-          }
-        : undefined,
+      body: {
+        provider: selectedModel?.provider ?? "openai",
+        model: selectedModel?.model ?? "gpt-4o-mini",
+      },
       onFinish(message, options) {
         console.log(options);
         if (options.finishReason === "stop") {

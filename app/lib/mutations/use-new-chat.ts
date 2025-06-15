@@ -5,15 +5,21 @@ import {
 } from "@tanstack/react-query";
 import { newChat, type NewChatInput } from "@/server/chats/newChat";
 import { queries } from "../queries";
-import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
-import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
 import { toast } from "sonner";
+import { useNewMessage } from "./use-new-message";
+import type { ChatWithMessages } from "@/server/chats/getChatWithMessages";
+import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
 
+type NewChatMutationInput = NewChatInput & {
+  message: string;
+  messageId: string;
+};
 export function useNewChat() {
   const queryClient = useQueryClient();
+  const { mutate: newMessage } = useNewMessage();
 
   return useMutation({
-    mutationFn: (input: NewChatInput) => newChat({ data: input }),
+    mutationFn: (input: NewChatMutationInput) => newChat({ data: input }),
     onMutate(input) {
       queryClient.setQueryData(
         queries.chats.withMessages(input.chatId, true).queryKey,
@@ -84,6 +90,30 @@ export function useNewChat() {
               },
               ...old.pages.slice(1),
             ],
+          };
+        }
+      );
+    },
+    onSuccess(data, variables) {
+      newMessage({
+        chatId: variables.chatId,
+        content: variables.message,
+        role: "user",
+        messageId: variables.messageId,
+      });
+
+      queryClient.setQueryData(
+        queries.chats.withMessages(variables.chatId, true).queryKey,
+        (old: ChatWithMessages): ChatWithMessages => {
+          const newChat = {
+            id: data.id,
+            title: data.title,
+            isPublic: false,
+            shareId: data.shareId,
+          };
+          return {
+            ...old,
+            chat: newChat,
           };
         }
       );
