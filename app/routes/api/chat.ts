@@ -9,6 +9,7 @@ import type { OpenAIChatModelId } from "@ai-sdk/openai/internal";
 import type { AnthropicMessagesModelId } from "@ai-sdk/anthropic/internal";
 import type { GoogleGenerativeAILanguageModel } from "@ai-sdk/google/internal";
 import { getSession } from "@/server/getSession";
+import { ratelimit } from "@/lib/ratelimiter";
 
 type ModelId =
   | OpenAIChatModelId
@@ -42,6 +43,14 @@ const sendMessageSchema = z.object({
 export const APIRoute = createAPIFileRoute("/api/chat")({
   async POST({ request }) {
     try {
+      const ip = request.headers.get("x-forwarded-for");
+      if (!ip) {
+        throw new Error("IP address not found");
+      }
+      const { success } = await ratelimit.limit(ip);
+      if (!success) {
+        throw new Error("Rate limit exceeded");
+      }
       const session = await getSession();
       if (!session) {
         throw new Error("User not found");
