@@ -19,6 +19,7 @@ export function useSubscribeMessages(chatId: string) {
         { event: "INSERT", schema: "public", table: "messages" },
         payload => {
           const newMessage = camelCaseKeys(payload.new) as MessageSelect;
+          if (newMessage.chatId !== chatId) return;
           newMessage.createdAt = new Date(newMessage.createdAt);
           const currentData = queryClient.getQueryData<ChatWithMessages>(
             queries.chats.withMessages(chatId).queryKey
