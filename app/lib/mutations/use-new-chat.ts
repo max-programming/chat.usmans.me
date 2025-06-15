@@ -39,7 +39,7 @@ export function useNewChat() {
         }
       );
       queryClient.setQueryData<InfiniteData<InfiniteChats>>(
-        queries.chats.infinite(20).queryKey,
+        queries.chats.infinite().queryKey,
         old => {
           if (!old || !old.pages || old.pages.length === 0) return old;
 
@@ -70,7 +70,7 @@ export function useNewChat() {
         (old: ChatWithMessages) => ({ ...old, messages: [] })
       );
       queryClient.setQueryData<InfiniteData<InfiniteChats>>(
-        queries.chats.infinite(20).queryKey,
+        queries.chats.infinite().queryKey,
         old => {
           if (!old || !old.pages || old.pages.length === 0) return old;
           return {

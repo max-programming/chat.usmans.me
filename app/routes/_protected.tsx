@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_protected")({
   },
   loader({ context }) {
     context.queryClient.ensureInfiniteQueryData<InfiniteChats>({
-      ...queries.chats.infinite(20),
+      ...queries.chats.infinite(),
       initialPageParam: undefined,
       getNextPageParam: (lastPage: InfiniteChats) => lastPage.nextCursor,
     });

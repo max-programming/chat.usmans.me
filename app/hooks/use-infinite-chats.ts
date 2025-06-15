@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { queries } from "@/lib/queries";
 import type { InfiniteChats } from "@/server/chats/getChatsInfinite";
 
-export function useInfiniteChats(limit: number = 20) {
+export function useInfiniteChats(limit = 20) {
   const { ref, inView } = useInView();
 
   const queryResult = useSuspenseInfiniteQuery({

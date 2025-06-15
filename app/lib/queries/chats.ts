@@ -5,7 +5,7 @@ import { getPublicChatWithMessages } from "@/server/chats/getPublicChatWithMessa
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 
 export const chats = createQueryKeys("chats", {
-  infinite: (limit: number = 20) => ({
+  infinite: (limit = 20) => ({
     queryKey: ["infinite", limit],
     queryFn: ({ pageParam }: { pageParam?: string }) =>
       getChatsInfinite({ data: { limit, cursor: pageParam } }),

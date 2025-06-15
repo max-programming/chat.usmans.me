@@ -20,7 +20,7 @@ export function useDeleteChat() {
     onMutate(input) {
       toast.loading("Deleting chat...");
       queryClient.setQueryData<InfiniteData<InfiniteChats>>(
-        queries.chats.infinite(20).queryKey,
+        queries.chats.infinite().queryKey,
         old => {
           if (!old || !old.pages || old.pages.length === 0) return old;
           return {
@@ -53,7 +53,7 @@ export function useDeleteChat() {
         queryKey: queries.chats.withMessages(variables.chatId).queryKey,
       });
       queryClient.invalidateQueries({
-        queryKey: queries.chats.infinite(20).queryKey,
+        queryKey: queries.chats.infinite().queryKey,
       });
       if (pathname !== `/chat/${variables.chatId}`) {
         navigate({ to: `/chat/${variables.chatId}`, replace: true });

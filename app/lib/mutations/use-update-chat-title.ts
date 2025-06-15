@@ -28,7 +28,7 @@ export function useUpdateChatTitle() {
       );
 
       queryClient.setQueryData<InfiniteData<InfiniteChats>>(
-        queries.chats.infinite(20).queryKey,
+        queries.chats.infinite().queryKey,
         old => {
           if (!old) return old;
 
