@@ -17,7 +17,6 @@ import { Route as ProtectedIndexImport } from './routes/_protected/index'
 import { Route as ShareShareIdImport } from './routes/share.$shareId'
 import { Route as AuthErrorImport } from './routes/auth/error'
 import { Route as AuthConfirmImport } from './routes/auth/confirm'
-import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as ProtectedChatChatIdImport } from './routes/_protected/chat/$chatId'
 
@@ -57,12 +56,6 @@ const AuthConfirmRoute = AuthConfirmImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthRegisterRoute = AuthRegisterImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
-} as any)
-
 const AuthLoginRoute = AuthLoginImport.update({
   id: '/login',
   path: '/login',
@@ -98,13 +91,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterImport
       parentRoute: typeof AuthImport
     }
     '/auth/confirm': {
@@ -149,12 +135,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -176,7 +160,6 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof ProtectedRouteWithChildren
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/share/$shareId': typeof ShareShareIdRoute
@@ -187,7 +170,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/share/$shareId': typeof ShareShareIdRoute
@@ -200,7 +182,6 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_protected': typeof ProtectedRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
   '/share/$shareId': typeof ShareShareIdRoute
@@ -213,7 +194,6 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/login'
-    | '/register'
     | '/auth/confirm'
     | '/auth/error'
     | '/share/$shareId'
@@ -223,7 +203,6 @@ export interface FileRouteTypes {
   to:
     | ''
     | '/login'
-    | '/register'
     | '/auth/confirm'
     | '/auth/error'
     | '/share/$shareId'
@@ -234,7 +213,6 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_protected'
     | '/_auth/login'
-    | '/_auth/register'
     | '/auth/confirm'
     | '/auth/error'
     | '/share/$shareId'
@@ -279,8 +257,7 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/login",
-        "/_auth/register"
+        "/_auth/login"
       ]
     },
     "/_protected": {
@@ -292,10 +269,6 @@ export const routeTree = rootRoute
     },
     "/_auth/login": {
       "filePath": "_auth/login.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/register": {
-      "filePath": "_auth/register.tsx",
       "parent": "/_auth"
     },
     "/auth/confirm": {
