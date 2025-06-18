@@ -21,8 +21,12 @@ export type AllowedModels = (typeof allowedModels)[number];
 
 const allowedModels = [
   "gpt-4o-mini",
+  "gpt-3.5-turbo",
+  "o4-mini",
   "claude-3-haiku-20240307",
+  "gemini-2.5-flash-preview-04-17",
   "gemini-2.0-flash-lite",
+  "gemini-2.0-flash",
 ] as const satisfies ModelId[];
 const allowedProviders = ["openai", "anthropic", "google"] as const;
 
@@ -67,7 +71,7 @@ export const ServerRoute = createServerFileRoute("/api/chat")
             modelInstance = anthropic("claude-3-5-haiku-latest");
             break;
           case "google":
-            modelInstance = google(model);
+            modelInstance = google("gemini-2.5-flash-preview-04-17");
             break;
         }
 
