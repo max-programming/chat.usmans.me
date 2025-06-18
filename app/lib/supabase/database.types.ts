@@ -11,27 +11,33 @@ export type Database = {
     Tables: {
       chats: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           is_archived: boolean | null
-          title: string | null
-          updated_at: string | null
+          is_public: boolean | null
+          share_id: string | null
+          title: string
+          updated_at: string
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           is_archived?: boolean | null
-          title?: string | null
-          updated_at?: string | null
+          is_public?: boolean | null
+          share_id?: string | null
+          title?: string
+          updated_at?: string
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           is_archived?: boolean | null
-          title?: string | null
-          updated_at?: string | null
+          is_public?: boolean | null
+          share_id?: string | null
+          title?: string
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
@@ -40,7 +46,7 @@ export type Database = {
         Row: {
           chat_id: string
           content: string
-          created_at: string | null
+          created_at: string
           id: string
           model_name: string | null
           role: string
@@ -49,8 +55,8 @@ export type Database = {
         Insert: {
           chat_id: string
           content: string
-          created_at?: string | null
-          id?: string
+          created_at?: string
+          id: string
           model_name?: string | null
           role: string
           token_count?: number | null
@@ -58,7 +64,7 @@ export type Database = {
         Update: {
           chat_id?: string
           content?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           model_name?: string | null
           role?: string
