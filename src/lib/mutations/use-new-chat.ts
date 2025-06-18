@@ -111,10 +111,7 @@ export function useNewChat() {
             isPublic: false,
             shareId: data.shareId,
           };
-          return {
-            ...old,
-            chat: newChat,
-          };
+          return { chat: newChat, messages: [] };
         }
       );
     },

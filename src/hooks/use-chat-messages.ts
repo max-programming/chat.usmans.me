@@ -46,7 +46,7 @@ export function useChatMessages({
         console.log(options);
         if (options.finishReason === "stop") {
           const modelName = models.find(
-            m => m.id === selectedModel?.model
+            m => m.id === (selectedModel?.model ?? "gpt-4o-mini")
           )?.name;
           newMessage({
             chatId: id,
@@ -78,7 +78,9 @@ export function useChatMessages({
     if (status === "streaming") {
       stop();
       const lastMessage = messages[messages.length - 1];
-      const modelName = models.find(m => m.id === selectedModel?.model)?.name;
+      const modelName = models.find(
+        m => m.id === (selectedModel?.model ?? "gpt-4o-mini")
+      )?.name;
       newMessage({
         chatId: id,
         content: lastMessage.content,
