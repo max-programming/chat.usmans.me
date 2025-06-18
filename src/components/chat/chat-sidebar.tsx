@@ -46,11 +46,8 @@ export function ChatSidebar() {
             </div>
             <div>
               <h2 className="text-base font-semibold text-sidebar-foreground leading-tight">
-                Chat Assistant
+                Usman's Chatbot
               </h2>
-              <p className="text-xs text-sidebar-foreground/60">
-                Powered by AI
-              </p>
             </div>
           </div>
           <Link to="/" onClick={() => isMobile && toggleSidebar()}>

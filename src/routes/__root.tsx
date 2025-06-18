@@ -26,7 +26,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Chat Assistant",
+        title: "Usman's Chatbot",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

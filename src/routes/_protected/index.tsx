@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_protected/")({
     return {
       meta: [
         {
-          title: "Chat Assistant",
+          title: "Usman's Chatbot",
         },
       ],
     };

@@ -7,7 +7,7 @@ export function ChatHome() {
 
   return (
     <>
-      <ChatHeader title="Chat Assistant" />
+      <ChatHeader title="Usman's Chatbot" />
       <div className="flex-1 min-h-0">
         <div className="flex h-full bg-background items-center justify-center">
           <div className="max-w-4xl w-full px-4 py-4">

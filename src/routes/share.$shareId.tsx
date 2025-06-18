@@ -18,7 +18,7 @@ export const Route = createFileRoute("/share/$shareId")({
     return {
       meta: [
         {
-          title: `Shared Chat | Chat Assistant`,
+          title: `Shared Chat | Usman's Chatbot`,
         },
         {
           name: "description",

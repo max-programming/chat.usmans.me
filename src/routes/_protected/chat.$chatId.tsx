@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_protected/chat/$chatId")({
     return {
       meta: [
         {
-          title: `New Chat | Chat Assistant`,
+          title: `New Chat | Usman's Chatbot`,
         },
       ],
     };
