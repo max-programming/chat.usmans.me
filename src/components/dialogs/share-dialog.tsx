@@ -54,7 +54,7 @@ export function ShareDialog({ children, chatId }: ShareDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {sharingEnabled ? (
-              <Globe className="w-5 h-5 text-primary" />
+              <Globe className="w-5 h-5 text-primary animate-in -spin-in-180 duration-700 transition-all ease-in-out" />
             ) : (
               <Lock className="w-5 h-5 text-muted-foreground" />
             )}
