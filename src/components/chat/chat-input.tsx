@@ -114,9 +114,9 @@ export function ChatInput({
               <div className="flex items-center gap-2 flex-shrink-0">
                 {/* Model Selector */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuTrigger asChild>
                         <Button
                           type="button"
                           variant="ghost"
@@ -132,12 +132,12 @@ export function ChatInput({
                           </span>
                           <ChevronDown className="h-3 w-3 ml-1 text-muted-foreground" />
                         </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Select AI Model</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </DropdownMenuTrigger>
+                      </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Select AI Model</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <DropdownMenuContent align="end" className="w-56 sm:w-64">
                     <DropdownMenuLabel>Select AI Model</DropdownMenuLabel>
                     <DropdownMenuSeparator />
