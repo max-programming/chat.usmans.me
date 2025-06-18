@@ -87,21 +87,24 @@ export function ChatSidebar() {
                         </div>
                       </Link>
                     </SidebarMenuButton>
-                    <DeleteChatDialog chatId={chat.id} chatTitle={chat.title}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DeleteChatDialog
+                          chatId={chat.id}
+                          chatTitle={chat.title}
+                        >
                           <SidebarMenuAction
                             showOnHover
                             className="hover:bg-destructive/10 hover:text-destructive transition-colors h-7 px-2"
                           >
                             <Trash2 />
                           </SidebarMenuAction>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p>Delete chat</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </DeleteChatDialog>
+                        </DeleteChatDialog>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p>Delete chat</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </SidebarMenuItem>
                 ))}
 
