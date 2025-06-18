@@ -14,7 +14,6 @@ import { useGenerateTitle } from "@/hooks/use-generate-title";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { queries } from "@/lib/queries";
 import { ChatHeader } from "./chat-header";
-import { useSubscribeMessages } from "@/hooks/use-subscribe-messages";
 
 interface ChatProps {
   chatId: string;
@@ -68,8 +67,6 @@ export function Chat({ chatId }: ChatProps) {
       generateTitle(initialMessage);
     })();
   });
-
-  useSubscribeMessages(chatId);
 
   async function handleSendMessageWithAutoScroll(content: string) {
     enableAutoScroll();
