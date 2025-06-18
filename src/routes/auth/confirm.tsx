@@ -29,7 +29,7 @@ const confirmFn = createServerFn({ method: "GET" })
       const supabase = createClient();
 
       const { error } = await supabase.auth.exchangeCodeForSession(code);
-      console.log(error?.message);
+      console.log({ errorMessage: error?.message });
       if (!error) {
         // redirect user to specified redirect URL or root of app
         throw redirect({ href: "/" });

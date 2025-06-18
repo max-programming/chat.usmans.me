@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { ChatError } from "./chat-error";
@@ -53,6 +53,71 @@ export function Chat({ chatId }: ChatProps) {
     scrollToBottom,
   } = useChatScroll();
 
+  // State to track which version is being shown for each group of consecutive assistant messages
+  const [versionStates, setVersionStates] = useState<Record<string, number>>(
+    {}
+  );
+
+  // Group consecutive assistant messages
+  const processedMessages = (() => {
+    const result: Array<{
+      type: "single" | "group";
+      message?: (typeof messages)[0];
+      messages?: typeof messages;
+      groupId?: string;
+    }> = [];
+
+    let i = 0;
+    while (i < messages.length) {
+      const currentMessage = messages[i];
+
+      if (currentMessage.role === "assistant") {
+        // Look for consecutive assistant messages
+        const groupMessages = [currentMessage];
+        let j = i + 1;
+
+        while (j < messages.length && messages[j].role === "assistant") {
+          groupMessages.push(messages[j]);
+          j++;
+        }
+
+        if (groupMessages.length > 1) {
+          // Multiple consecutive assistant messages - treat as versions
+          const groupId = `group-${i}`;
+          result.push({
+            type: "group",
+            messages: groupMessages,
+            groupId,
+          });
+        } else {
+          // Single assistant message
+          result.push({
+            type: "single",
+            message: currentMessage,
+          });
+        }
+
+        i = j;
+      } else {
+        // User message
+        result.push({
+          type: "single",
+          message: currentMessage,
+        });
+        i++;
+      }
+    }
+
+    return result;
+  })();
+
+  function handleVersionChange(groupId: string, newVersionIndex: number) {
+    setVersionStates(prev => ({
+      ...prev,
+      [groupId]: newVersionIndex,
+    }));
+  }
+
   useEffect(() => {
     if (shouldAutoScroll) {
       scrollToBottom();
@@ -94,14 +159,50 @@ export function Chat({ chatId }: ChatProps) {
             onScroll={handleScroll}
           >
             <div className="max-w-4xl mx-auto px-3 py-3 space-y-4 sm:px-4 sm:py-4">
-              {messages.map((message, index) => (
-                <ChatMessage
-                  key={message.id}
-                  message={message}
-                  onRetry={handleMessageRetryWithAutoScroll}
-                  canRetry={status !== "streaming"}
-                />
-              ))}
+              {processedMessages.map((item, index) => {
+                if (item.type === "single") {
+                  return (
+                    <ChatMessage
+                      key={item.message!.id}
+                      message={item.message!}
+                      onRetry={handleMessageRetryWithAutoScroll}
+                      canRetry={status !== "streaming"}
+                    />
+                  );
+                } else {
+                  // Group of consecutive assistant messages
+                  const groupId = item.groupId!;
+                  const currentVersionIndex = versionStates[groupId] ?? 0;
+                  const currentMessage = item.messages![currentVersionIndex];
+
+                  return (
+                    <ChatMessage
+                      key={`${groupId}-${currentVersionIndex}`}
+                      message={currentMessage}
+                      onRetry={handleMessageRetryWithAutoScroll}
+                      canRetry={status !== "streaming"}
+                      hasMultipleVersions={true}
+                      currentVersionIndex={currentVersionIndex}
+                      totalVersions={item.messages!.length}
+                      onPreviousVersion={() =>
+                        handleVersionChange(
+                          groupId,
+                          Math.max(0, currentVersionIndex - 1)
+                        )
+                      }
+                      onNextVersion={() =>
+                        handleVersionChange(
+                          groupId,
+                          Math.min(
+                            item.messages!.length - 1,
+                            currentVersionIndex + 1
+                          )
+                        )
+                      }
+                    />
+                  );
+                }
+              })}
 
               {status === "streaming" ||
                 (status === "submitted" && <ChatLoading />)}

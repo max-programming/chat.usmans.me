@@ -31,7 +31,7 @@ export const Route = createRootRouteWithContext<{
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
-  async beforeLoad({ context }) {
+  async beforeLoad() {
     const user = await fetchUser();
     return { user };
   },

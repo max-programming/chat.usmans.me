@@ -43,7 +43,6 @@ export function useChatMessages({
         model: selectedModel?.model ?? "gpt-4o-mini",
       },
       onFinish(message, options) {
-        console.log(options);
         if (options.finishReason === "stop") {
           const modelName = models.find(
             m => m.id === (selectedModel?.model ?? "gpt-4o-mini")
@@ -57,7 +56,7 @@ export function useChatMessages({
             modelName,
           });
         } else {
-          console.log(options);
+          console.log({ options });
         }
       },
       onResponse: response => {
