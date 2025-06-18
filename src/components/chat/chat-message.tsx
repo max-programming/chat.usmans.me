@@ -106,52 +106,6 @@ export function ChatMessage({
             minute: "2-digit",
           })}
         </p>
-        {hasMultipleVersions && (
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-xs text-muted-foreground">
-              Version {currentVersionIndex! + 1} of {totalVersions}
-            </span>
-            <div className="flex items-center gap-1 ml-auto">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onPreviousVersion}
-                      variant="ghost"
-                      size="sm"
-                      disabled={currentVersionIndex === 0}
-                      className="h-6 w-6 p-0"
-                    >
-                      <ChevronLeft className="w-3 h-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Previous version</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={onNextVersion}
-                      variant="ghost"
-                      size="sm"
-                      disabled={currentVersionIndex === totalVersions! - 1}
-                      className="h-6 w-6 p-0"
-                    >
-                      <ChevronRight className="w-3 h-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Next version</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="flex mt-2 gap-1 justify-start items-center">
@@ -193,8 +147,53 @@ export function ChatMessage({
           </TooltipProvider>
         )}
 
+        {hasMultipleVersions && (
+          <>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={onPreviousVersion}
+                    variant="ghost"
+                    size="icon"
+                    disabled={currentVersionIndex === 0}
+                  >
+                    <ChevronLeft className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Previous version</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={onNextVersion}
+                    variant="ghost"
+                    size="icon"
+                    disabled={currentVersionIndex === totalVersions! - 1}
+                  >
+                    <ChevronRight className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Next version</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </>
+        )}
+
         <span className="text-xs text-muted-foreground">
           {message.modelName}
+          {hasMultipleVersions && (
+            <span className="ml-2">
+              Version {currentVersionIndex! + 1} of {totalVersions}
+            </span>
+          )}
         </span>
       </div>
     </div>
