@@ -31,8 +31,11 @@ export const Route = createRootRouteWithContext<{
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
-  async beforeLoad() {
-    const user = await fetchUser();
+  async beforeLoad({ context }) {
+    const user = await context.queryClient.fetchQuery({
+      queryKey: ["user"],
+      queryFn: fetchUser,
+    });
     return { user };
   },
   errorComponent: props => (
