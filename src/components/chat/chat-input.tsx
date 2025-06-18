@@ -121,7 +121,7 @@ export function ChatInput({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full border border-border hover:bg-muted/50 transition-colors"
+                          className="h-9 sm:h-10 px-2.5 sm:px-3 border border-border hover:bg-muted/50 transition-colors"
                         >
                           <currentModel.icon
                             className="h-4 w-4"
