@@ -11,6 +11,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { fetchUser } from "@/server/fetchUser";
 import appCss from "@/styles/app.css?url";
+import icon from "@/assets/icon.ico?url";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRouteWithContext<{
@@ -29,7 +30,10 @@ export const Route = createRootRouteWithContext<{
         title: "Usman's Chatbot",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: icon },
+    ],
   }),
   async beforeLoad({ context }) {
     const user = await context.queryClient.fetchQuery({
