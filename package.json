@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "start": "bun run --env-file=.env vite preview",
-    "db:gen-types": "supabase gen types --project-id \"asxylwzwynukxitznvyn\" --schema public > app/lib/supabase/database.types.ts",
+    "db:gen-types": "supabase gen types --project-id \"asxylwzwynukxitznvyn\" --schema public > src/lib/supabase/database.types.ts",
     "db:push": "drizzle-kit push"
   },
   "devDependencies": {
